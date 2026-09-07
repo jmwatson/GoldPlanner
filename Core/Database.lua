@@ -8,7 +8,9 @@ local DEFAULT_DATABASE = {
         history = {},
     },
     totalHistory = {},
-    goal = nil,
+    goal = {
+        copper = 0,
+    },
 };
 
 local function CopyDefaults(source, target)
