@@ -4,14 +4,16 @@ local EVENTS = GoldPlanner.EVENTS;
 GoldPlanner.name = ADDON_NAME;
 GoldPlanner.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version");
 
-local eventFrame = CreateFrame("Frame");
+local function RegisterSlashCommands()
+    SLASH_GOLDPLANNER1 = GoldPlanner.STRINGS.SLASH_COMMAND;
+    SLASH_GOLDPLANNER2 = GoldPlanner.STRINGS.SLASH_COMMAND_SHORT;
 
-eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
-eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
-eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
-eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
+    SlashCmdList["GOLDPLANNER"] = function()
+        GoldPlanner:ToggleDashboard();
+    end
+end
 
-eventFrame:SetScript("OnEvent", function(self, event, ...)
+local function HandleEvents(self, event, ...)
     if event == EVENTS.ADDON_LOADED then
         local loadedAddonName = ...;
 
@@ -20,6 +22,8 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
         end
 
         GoldPlanner:InitializeDatabase();
+        GoldPlanner:BuildDashboard();
+        RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
@@ -28,4 +32,11 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
     end
-end);
+end
+
+local eventFrame = CreateFrame("Frame");
+eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
+eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
+eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
+eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
+eventFrame:SetScript("OnEvent", HandleEvents);

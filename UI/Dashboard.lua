@@ -1,6 +1,10 @@
 local _, GoldPlanner = ...;
 
-function BuildDashboard()
+function GoldPlanner:BuildDashboard()
+    if self.dashboard then
+        return;
+    end
+
     local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent);
 
     dashboard:SetSize(500, 350);
@@ -25,25 +29,18 @@ function BuildDashboard()
 
     local title = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     title:SetPoint("TOP", 0, -20);
-    title:SetText(GoldPlanner.STRINGS.ADDON_TITLE);
+    title:SetText(self.STRINGS.ADDON_TITLE);
 
     local closeButton = CreateFrame("Button", nil, dashboard, "UIPanelCloseButton");
     closeButton:SetPoint("TOPRIGHT", -5, -5);
 
-    function GoldPlanner:ToggleDashboard()
-        if dashboard:IsShown() then
-            dashboard:Hide();
-        else
-            dashboard:Show();
-        end
-    end
-
-    return dashboard;
+    self.dashboard = dashboard;
 end
 
-SLASH_GOLDPLANNER1 = GoldPlanner.STRINGS.SLASH_COMMAND;
-SLASH_GOLDPLANNER2 = GoldPlanner.STRINGS.SLASH_COMMAND_SHORT;
-
-SlashCmdList["GOLDPLANNER"] = function()
-    GoldPlanner:ToggleDashboard();
+function GoldPlanner:ToggleDashboard()
+    if self.dashboard:IsShown() then
+        self.dashboard:Hide();
+    else
+        self.dashboard:Show();
+    end
 end
