@@ -1,0 +1,11 @@
+## Interface: 120000
+## Title: Gold Planner
+## Notes: Plan, track, and reach your gold goals.
+## Author: AgentPrometheus
+## Version: 0.1.0
+## SavedVariables: GoldPlannerDB
+
+Core/Constants.lua
+Core/Init.lua
+Core/Database.lua
+Core/Gold.lua

@@ -1,0 +1,29 @@
+local _, GoldPlanner = ...;
+
+function GoldPlanner:GetCharacterKey()
+    local name = UnitName("player");
+    local realm = GetRealmName();
+
+    return name .. "-" .. realm;
+end
+
+function GoldPlanner:GetCharacter()
+    local key = self:GetCharacterKey();
+
+    if not self.db.characters[key] then
+        self.db.characters[key] = {
+            name = UnitName("player"),
+            realm = GetRealmName(),
+            copper = 0,
+            history = {},
+        };
+    end
+
+    return self.db.characters[key];
+end
+
+function GoldPlanner:UpdateCharacterGold()
+    local character = self:GetCharacter();
+
+    character.copper = GetMoney();
+end
