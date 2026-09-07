@@ -8,6 +8,7 @@ local eventFrame = CreateFrame("Frame");
 
 eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
 eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
+eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
 
 eventFrame:SetScript("OnEvent", function(self, event, ...)
     if event == EVENTS.ADDON_LOADED then
@@ -19,12 +20,13 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
         end
 
         GoldPlanner:InitializeDatabase();
-        GoldPlanner:UpdateCharacterGold();
-        GoldPlanner:UpdateWarbandGold();
+        GoldPlanner:UpdateCharacterCopper();
 
         print(addonPrintName .. " v" .. GoldPlanner.version .. " loaded.");
         print("Current gold:", GetMoneyString(GoldPlanner:GetTotalCopper(), true));
     elseif event == EVENTS.PLAYER_MONEY then
-        GoldPlanner:UpdateCharacterGold();
+        GoldPlanner:UpdateCharacterCopper();
+    elseif event == EVENTS.ACCOUNT_MONEY then
+        GoldPlanner:UpdateWarbandCopper();
     end
 end);

@@ -26,7 +26,7 @@ function GoldPlanner:GetWarbandCopper()
     return C_Bank.FetchDepositedMoney(Enum.BankType.Account) or 0;
 end
 
-function GoldPlanner:UpdateCharacterGold()
+function GoldPlanner:UpdateCharacterCopper()
     local character = self:GetCharacter();
 
     character.copper = GetMoney();
@@ -35,7 +35,7 @@ function GoldPlanner:UpdateCharacterGold()
     self:AddTotalHistorySnapshot();
 end
 
-function GoldPlanner:UpdateWarbandGold()
+function GoldPlanner:UpdateWarbandCopper()
     local copper = self:GetWarbandCopper();
 
     self.db.warband.copper = copper;
