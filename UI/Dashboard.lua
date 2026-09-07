@@ -60,6 +60,8 @@ function GoldPlanner:BuildDashboard()
     local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     timeToGoal:SetPoint("TOPLEFT", 20, -300);
 
+    GoldPlanner:BuildActivities(dashboard);
+
     dashboard.characterGold = characterGold;
     dashboard.warbandGold = warbandGold;
     dashboard.totalGold = totalGold;
@@ -90,7 +92,7 @@ function GoldPlanner:UpdateDashboard()
         dashboard.goal:SetText(self.STRINGS.GOAL .. ": " .. self.STRINGS.NO_GOAL);
         dashboard.remaining:SetText(self.STRINGS.EMPTY_STRING);
         dashboard.progress:SetText(self.STRINGS.EMPTY_STRING);
-        dashboard.timeToGoal(sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
+        dashboard.timeToGoal:SetText(sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
     else
         local timeToGoal = self:GetTimeToGoalDisplay();
         dashboard.goal:SetText(sformat("%s: %s", self.STRINGS.GOAL, GetMoneyString(goal, true)));

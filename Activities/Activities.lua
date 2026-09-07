@@ -51,3 +51,34 @@ function GoldPlanner:GetActivity(id)
 
     return nil;
 end
+
+function GoldPlanner:BuildActivities(parent)
+    local activities = CreateFrame("Frame", nil, parent);
+    activities:SetPoint("TOPLEFT", 20, -340);
+    activities:SetSize(460, 100);
+
+    local activitiesTitle = activities:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    activitiesTitle:SetPoint("TOPLEFT", 0, 0);
+    activitiesTitle:SetText("Activities");
+
+    local activityList = self:GetActivities();
+
+    for index, activity in ipairs(activityList) do
+        local yOffset = -(index * 20);
+
+        local activityName = activities:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        activityName:SetPoint("TOPLEFT", 0, yOffset);
+        activityName:SetText(activity.name);
+
+        local activityCategory = activities:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        activityCategory:SetPoint("TOPLEFT", 250, yOffset);
+        activityCategory:SetText(activity.category);
+
+        activities[activity.id] = {
+            name = activityName,
+            category = activityCategory,
+        };
+    end
+
+    parent.activities = activities;
+end
