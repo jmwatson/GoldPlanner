@@ -8,6 +8,7 @@ function GoldPlanner:BuildDashboard()
     end
 
     local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent);
+    tinsert(UISpecialFrames, "GoldPlannerDashboard");
 
     dashboard:SetSize(500, 350);
     dashboard:SetPoint("CENTER");
