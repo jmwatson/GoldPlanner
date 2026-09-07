@@ -7,7 +7,7 @@ function GoldPlanner:BuildDashboard()
         return;
     end
 
-    local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent);
+    local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent, "BasicFrameTemplateWithInset");
     tinsert(UISpecialFrames, "GoldPlannerDashboard");
 
     dashboard:SetSize(500, 350);
@@ -26,40 +26,33 @@ function GoldPlanner:BuildDashboard()
 
     dashboard:Hide();
 
-    local background = dashboard:CreateTexture(nil, "BACKGROUND");
-    background:SetAllPoints();
-    background:SetColorTexture(0, 0, 0, 1);
-
     local title = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
-    title:SetPoint("TOP", 0, -20);
+    title:SetPoint("TOP", 0, -5);
     title:SetText(self.STRINGS.ADDON_TITLE);
 
-    local closeButton = CreateFrame("Button", nil, dashboard, "UIPanelCloseButton");
-    closeButton:SetPoint("TOPRIGHT", -5, -5);
-
     local characterGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    characterGold:SetPoint("TOPLEFT", 20, -70);
+    characterGold:SetPoint("TOPLEFT", 20, -50);
 
     local warbandGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    warbandGold:SetPoint("TOPLEFT", 20, -100);
+    warbandGold:SetPoint("TOPLEFT", 20, -80);
 
     local totalGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    totalGold:SetPoint("TOPLEFT", 20, -130);
+    totalGold:SetPoint("TOPLEFT", 20, -110);
 
     local goal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    goal:SetPoint("TOPLEFT", 20, -175);
+    goal:SetPoint("TOPLEFT", 20, -155);
 
     local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    remaining:SetPoint("TOPLEFT", 20, -205);
+    remaining:SetPoint("TOPLEFT", 20, -185);
 
     local progress = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    progress:SetPoint("TOPLEFT", 20, -235);
+    progress:SetPoint("TOPLEFT", 20, -215);
 
     local rate = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    rate:SetPoint("TOPLEFT", 20, -270);
+    rate:SetPoint("TOPLEFT", 20, -250);
 
     local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    timeToGoal:SetPoint("TOPLEFT", 20, -300);
+    timeToGoal:SetPoint("TOPLEFT", 20, -280);
 
     GoldPlanner:BuildActivities(dashboard);
 
