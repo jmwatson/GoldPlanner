@@ -13,3 +13,4 @@ Core/Gold.lua
 History/History.lua
 Statistics/Statistics.lua
 Goals/Goals.lua
+Activities/Activities.lua
