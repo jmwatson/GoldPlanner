@@ -18,6 +18,8 @@ GoldPlanner.COLORS = {
 GoldPlanner.STRINGS = {
     SLASH_COMMAND = "/goldplanner",
     SLASH_COMMAND_SHORT = "/gp",
+
+    ADDON_TITLE = "Gold Planner"
 };
 
 function GoldPlanner:ColorizeText(text, color)
