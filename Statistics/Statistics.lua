@@ -40,3 +40,17 @@ function GoldPlanner:GetMoneyRate(windowSeconds)
         rate = copperDelta / elapsed,
     };
 end
+
+function GoldPlanner:GetTimeToAmount(currentCopper, targetCopper, rate)
+    local copperDelta = targetCopper - currentCopper;
+
+    if not rate or rate <= 0 then
+        return nil;
+    end
+
+    if copperDelta <= 0 then
+        return 0;
+    end
+
+    return copperDelta / rate;
+end
