@@ -1,5 +1,7 @@
 local _, GoldPlanner = ...;
 
+local sformat = string.format;
+
 function GoldPlanner:BuildDashboard()
     if self.dashboard then
         return;
@@ -43,9 +45,21 @@ function GoldPlanner:BuildDashboard()
     local totalGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     totalGold:SetPoint("TOPLEFT", 20, -130);
 
+    local goal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    goal:SetPoint("TOPLEFT", 20, -175);
+
+    local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    remaining:SetPoint("TOPLEFT", 20, -205);
+
+    local progress = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    progress:SetPoint("TOPLEFT", 20, -235);
+
     dashboard.characterGold = characterGold;
     dashboard.warbandGold = warbandGold;
     dashboard.totalGold = totalGold;
+    dashboard.goal = goal;
+    dashboard.remaining = remaining;
+    dashboard.progress = progress;
 
     self.dashboard = dashboard;
 
@@ -61,6 +75,18 @@ function GoldPlanner:UpdateDashboard()
     dashboard.characterGold:SetText("Character: " .. GetMoneyString(self:GetCharacter().copper, true));
     dashboard.warbandGold:SetText("Warband: " .. GetMoneyString(self:GetWarband().copper, true));
     dashboard.totalGold:SetText("Total: " .. GetMoneyString(self:GetTotalCopper(), true));
+
+    local goal = self:GetGoal();
+
+    if goal <= 0 then
+        dashboard.goal:SetText(self.STRINGS.GOAL .. ": " .. self.STRINGS.NO_GOAL);
+        dashboard.remaining:SetText(self.STRINGS.EMPTY_STRING);
+        dashboard.progress:SetText(self.STRINGS.EMPTY_STRING);
+    else
+        dashboard.goal:SetText(sformat("%s: %s", self.STRINGS.GOAL, GetMoneyString(goal, true)));
+        dashboard.remaining:SetText(sformat("%s: %s", self.STRINGS.REMAINING, GetMoneyString(self:GetGoalRemaining(), true)));
+        dashboard.progress:SetText(sformat("%s: %s", self.STRINGS.PROGRESS, sformat("%.1f%%", self:GetGoalProgress() * 100)));
+    end
 end
 
 function GoldPlanner:ToggleDashboard()

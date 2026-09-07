@@ -16,10 +16,21 @@ GoldPlanner.COLORS = {
 };
 
 GoldPlanner.STRINGS = {
+    EMPTY_STRING = "",
+
     SLASH_COMMAND = "/goldplanner",
     SLASH_COMMAND_SHORT = "/gp",
 
-    ADDON_TITLE = "Gold Planner"
+    ADDON_TITLE = "Gold Planner",
+
+    CHARACTER_GOLD = "Character",
+    WARBAND_GOLD = "Warband",
+    TOTAL_GOLD = "Total",
+
+    GOAL = "Goal",
+    REMAINING = "Remaining",
+    PROGRESS = "Progress",
+    NO_GOAL = "No goal set",
 };
 
 function GoldPlanner:ColorizeText(text, color)
