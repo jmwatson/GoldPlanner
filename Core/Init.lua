@@ -20,9 +20,10 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 
         GoldPlanner:InitializeDatabase();
         GoldPlanner:UpdateCharacterGold();
+        GoldPlanner:UpdateWarbandGold();
 
         print(addonPrintName .. " v" .. GoldPlanner.version .. " loaded.");
-        print("Current gold:", GetMoneyString(GetMoney(), true));
+        print("Current gold:", GetMoneyString(GoldPlanner:GetTotalCopper(), true));
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterGold();
     end

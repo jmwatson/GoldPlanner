@@ -3,6 +3,8 @@ local _, GoldPlanner = ...;
 GoldPlanner.EVENTS = {
     ADDON_LOADED = "ADDON_LOADED",
     PLAYER_MONEY = "PLAYER_MONEY",
+    BANKFRAME_OPENED = "BANKFRAME_OPENED",
+    BANKFRAME_CLOSED = "BANKFRAME_CLOSED",
 };
 
 GoldPlanner.COLORS = {

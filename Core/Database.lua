@@ -7,6 +7,7 @@ local DEFAULT_DATABASE = {
         gold = 0,
         history = {},
     },
+    totalHistory = {},
     goal = nil,
 };
 
