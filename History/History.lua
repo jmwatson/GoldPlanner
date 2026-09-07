@@ -20,17 +20,14 @@ end
 function GoldPlanner:AddCharacterHistorySnapshot()
     local character = self:GetCharacter();
     AddHistorySnapshot(character.history, character.copper);
-    -- print("Adds character history snapshot");
 end
 
 function GoldPlanner:AddWarbandHistorySnapshot()
     AddHistorySnapshot(self.db.warband.history, self.db.warband.copper);
-    -- print("Adds warband history snapshot");
 end
 
 function GoldPlanner:AddTotalHistorySnapshot()
     AddHistorySnapshot(self.db.totalHistory, self:GetTotalCopper());
-    -- print("Adds total history snapshot");
 end
 
 function GoldPlanner:ScheduleTotalHistorySnapshot()
@@ -44,6 +41,5 @@ function GoldPlanner:ScheduleTotalHistorySnapshot()
     C_Timer.After(0, function()
         totalHistoryPending = false;
         self:AddTotalHistorySnapshot();
-        -- print("Scheduled total history snapshot");
     end);
 end

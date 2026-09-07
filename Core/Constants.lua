@@ -15,6 +15,15 @@ GoldPlanner.COLORS = {
     COPPER = "B87333",
 };
 
+GoldPlanner.STRINGS = {
+    SLASH_COMMAND = "/goldplanner",
+    SLASH_COMMAND_SHORT = "/gp",
+};
+
 function GoldPlanner:ColorizeText(text, color)
     return string.format("|cff%s%s|r", color, text);
+end
+
+function GoldPlanner:Log(...)
+    print(self:ColorizeText(self.name, self.COLORS.GOLD) .. ":", ...);
 end
