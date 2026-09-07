@@ -31,6 +31,12 @@ GoldPlanner.STRINGS = {
     REMAINING = "Remaining",
     PROGRESS = "Progress",
     NO_GOAL = "No goal set",
+
+    RATE = "Rate",
+    TIME_TO_GOAL = "Time to Goal",
+    NOT_ENOUGH_DATA = "Not enough data",
+    UNAVAILABLE = "Unavailable",
+    REACHED = "Reached",
 };
 
 function GoldPlanner:ColorizeText(text, color)

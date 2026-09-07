@@ -54,12 +54,20 @@ function GoldPlanner:BuildDashboard()
     local progress = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     progress:SetPoint("TOPLEFT", 20, -235);
 
+    local rate = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    rate:SetPoint("TOPLEFT", 20, -270);
+
+    local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    timeToGoal:SetPoint("TOPLEFT", 20, -300);
+
     dashboard.characterGold = characterGold;
     dashboard.warbandGold = warbandGold;
     dashboard.totalGold = totalGold;
     dashboard.goal = goal;
     dashboard.remaining = remaining;
     dashboard.progress = progress;
+    dashboard.rate = rate;
+    dashboard.timeToGoal = timeToGoal;
 
     self.dashboard = dashboard;
 
@@ -82,11 +90,21 @@ function GoldPlanner:UpdateDashboard()
         dashboard.goal:SetText(self.STRINGS.GOAL .. ": " .. self.STRINGS.NO_GOAL);
         dashboard.remaining:SetText(self.STRINGS.EMPTY_STRING);
         dashboard.progress:SetText(self.STRINGS.EMPTY_STRING);
+        dashboard.timeToGoal(sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
     else
+        local timeToGoal = self:GetTimeToGoalDisplay();
         dashboard.goal:SetText(sformat("%s: %s", self.STRINGS.GOAL, GetMoneyString(goal, true)));
         dashboard.remaining:SetText(sformat("%s: %s", self.STRINGS.REMAINING, GetMoneyString(self:GetGoalRemaining(), true)));
         dashboard.progress:SetText(sformat("%s: %s", self.STRINGS.PROGRESS, sformat("%.1f%%", self:GetGoalProgress() * 100)));
+        dashboard.timeToGoal:SetText(timeToGoal and
+            sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, timeToGoal) or
+            sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.UNAVAILABLE));
     end
+
+    local rateDisplay = self:GetMoneyRateDisplay();
+    dashboard.rate:SetText(rateDisplay and
+        sformat("%s: %s/hour", self.STRINGS.RATE, rateDisplay) or
+        sformat("%s: %s", self.STRINGS.RATE, self.STRINGS.NOT_ENOUGH_DATA));
 end
 
 function GoldPlanner:ToggleDashboard()
