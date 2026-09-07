@@ -22,8 +22,34 @@ function GoldPlanner:GetCharacter()
     return self.db.characters[key];
 end
 
+function GoldPlanner:GetWarbandCopper()
+    return C_Bank.FetchDepositedMoney(Enum.BankType.Account) or 0;
+end
+
 function GoldPlanner:UpdateCharacterGold()
     local character = self:GetCharacter();
 
     character.copper = GetMoney();
+
+    self:AddHistorySnapshot();
+    self:AddTotalHistorySnapshot();
+end
+
+function GoldPlanner:UpdateWarbandGold()
+    local copper = self:GetWarbandCopper();
+
+    self.db.warband.copper = copper;
+
+    self:AddWarbandHistorySnapshot();
+    self:AddTotalHistorySnapshot();
+end
+
+function GoldPlanner:GetTotalCopper()
+    local characterTotal = 0;
+
+    for _, character in pairs(self.db.characters) do
+        characterTotal = characterTotal + character.copper;
+    end
+
+    return characterTotal + self:GetWarbandCopper();
 end
