@@ -9,3 +9,6 @@ Core/Constants.lua
 Core/Init.lua
 Core/Database.lua
 Core/Gold.lua
+
+History/History.lua
+Statistics/Statistics.lua
