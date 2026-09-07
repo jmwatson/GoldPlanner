@@ -4,13 +4,32 @@ local EVENTS = GoldPlanner.EVENTS;
 GoldPlanner.name = ADDON_NAME;
 GoldPlanner.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version");
 
+local function HandleSlashCommand(parameters)
+    local command, value = parameters:match("^(%S+)%s*(.*)$");
+    local usage = "Usage: /gp goal <gold amount>";
+
+    if command == "goal" then
+        local gold = tonumber(value);
+
+        if not gold or gold <= 0 then
+            GoldPlanner:Log(usage);
+            return;
+        end
+
+        GoldPlanner:SetGoal(gold * 10000);
+        GoldPlanner:UpdateDashboard();
+
+        GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
+    else
+        GoldPlanner:ToggleDashboard();
+    end
+end
+
 local function RegisterSlashCommands()
     SLASH_GOLDPLANNER1 = GoldPlanner.STRINGS.SLASH_COMMAND;
     SLASH_GOLDPLANNER2 = GoldPlanner.STRINGS.SLASH_COMMAND_SHORT;
 
-    SlashCmdList["GOLDPLANNER"] = function()
-        GoldPlanner:ToggleDashboard();
-    end
+    SlashCmdList["GOLDPLANNER"] = HandleSlashCommand;
 end
 
 local function HandleEvents(self, event, ...)
