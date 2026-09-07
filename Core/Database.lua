@@ -4,7 +4,7 @@ local DEFAULT_DATABASE = {
     version = 1,
     characters = {},
     warband = {
-        gold = 0,
+        copper = 0,
         history = {},
     },
     totalHistory = {},
