@@ -35,7 +35,7 @@ function GoldPlanner:GetMoneyRate(windowSeconds)
     local copperDelta = latest.copper - oldest.copper;
 
     return {
-        copper = copperDelta,
+        copperDelta = copperDelta,
         elapsed = elapsed,
         rate = copperDelta / elapsed,
     };
