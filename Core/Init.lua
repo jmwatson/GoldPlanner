@@ -27,10 +27,13 @@ local function HandleEvents(self, event, ...)
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
+        GoldPlanner:UpdateDashboard();
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
+        GoldPlanner:UpdateDashboard();
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
+        GoldPlanner:UpdateDashboard();
     end
 end
 

@@ -22,6 +22,20 @@ function GoldPlanner:GetCharacter()
     return self.db.characters[key];
 end
 
+function GoldPlanner:GetWarband()
+    return self.db.warband;
+end
+
+function GoldPlanner:GetTotalCopper()
+    local copperTotal = self.db.warband.copper;
+
+    for _, character in pairs(self.db.characters) do
+        copperTotal = copperTotal + character.copper;
+    end
+
+    return copperTotal;
+end
+
 function GoldPlanner:UpdateCharacterCopper()
     local character = self:GetCharacter();
 
@@ -36,14 +50,4 @@ function GoldPlanner:UpdateWarbandCopper()
 
     self:AddWarbandHistorySnapshot();
     self:ScheduleTotalHistorySnapshot();
-end
-
-function GoldPlanner:GetTotalCopper()
-    local copperTotal = self.db.warband.copper;
-
-    for _, character in pairs(self.db.characters) do
-        copperTotal = copperTotal + character.copper;
-    end
-
-    return copperTotal;
 end
