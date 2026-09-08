@@ -39,10 +39,10 @@ GoldPlanner.STRINGS = {
     REACHED = "Reached",
 };
 
-function GoldPlanner:ColorizeText(text, color)
+function GoldPlanner:ColorText(text, color)
     return string.format("|cff%s%s|r", color, text);
 end
 
 function GoldPlanner:Log(...)
-    print(self:ColorizeText(self.name, self.COLORS.GOLD) .. ":", ...);
+    print(self:ColorText(self.name, self.COLORS.GOLD) .. ":", ...);
 end

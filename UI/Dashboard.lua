@@ -30,29 +30,67 @@ function GoldPlanner:BuildDashboard()
     title:SetPoint("TOP", 0, -5);
     title:SetText(self.STRINGS.ADDON_TITLE);
 
+    local goldText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    goldText:SetPoint("TOPLEFT", 20, -40);
+    goldText:SetText("Gold");
+
     local characterGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    characterGold:SetPoint("TOPLEFT", 20, -50);
+    characterGold:SetPoint("TOPLEFT", 20, -60);
 
     local warbandGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     warbandGold:SetPoint("TOPLEFT", 20, -80);
 
     local totalGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    totalGold:SetPoint("TOPLEFT", 20, -110);
+    totalGold:SetPoint("TOPLEFT", 20, -100);
+
+    local goalText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    goalText:SetPoint("TOPLEFT", 20, -130);
+    goalText:SetText("Goal");
 
     local goal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    goal:SetPoint("TOPLEFT", 20, -155);
+    goal:SetPoint("TOPLEFT", 20, -150);
 
     local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    remaining:SetPoint("TOPLEFT", 20, -185);
+    remaining:SetPoint("TOPLEFT", 20, -170);
 
-    local progress = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    progress:SetPoint("TOPLEFT", 20, -215);
+    local offset = 5;
+    local progress = CreateFrame("StatusBar", nil, dashboard, "BackdropTemplate");
+    progress:SetPoint("TOPLEFT", 20, -190);
+    progress:SetSize(300, 30);
+    progress:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 12,
+        insets = {
+            left = 3,
+            right = 3,
+            top = 3,
+            bottom = 3,
+        },
+    });
+    progress.bar = CreateFrame("StatusBar", nil, progress);
+    progress.bar:SetPoint("TOPLEFT", offset, -offset);
+    progress.bar:SetPoint("BOTTOMRIGHT", -offset, offset);
+    progress.bar:SetMinMaxValues(0, 1);
+
+    local progressTexture = progress.bar:CreateTexture(nil, "ARTWORK");
+    progressTexture:SetColorTexture(0.8, 0.55, 0);
+    progress.bar:SetStatusBarTexture(progressTexture);
+
+    progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    progress.bar.text:SetPoint("CENTER");
+
+    local statsText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    statsText:SetPoint("TOPLEFT", 20, -220);
+    statsText:SetText("Statistics");
 
     local rate = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    rate:SetPoint("TOPLEFT", 20, -250);
+    rate:SetPoint("TOPLEFT", 20, -240);
 
     local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    timeToGoal:SetPoint("TOPLEFT", 20, -280);
+    timeToGoal:SetPoint("TOPLEFT", 20, -260);
 
     GoldPlanner:BuildActivities(dashboard);
 
@@ -85,13 +123,16 @@ function GoldPlanner:UpdateDashboard()
     if goal <= 0 then
         dashboard.goal:SetText(self.STRINGS.GOAL .. ": " .. self.STRINGS.NO_GOAL);
         dashboard.remaining:SetText(self.STRINGS.EMPTY_STRING);
-        dashboard.progress:SetText(self.STRINGS.EMPTY_STRING);
+        dashboard.progress.bar:SetValue(0);
+        dashboard.progress.bar.text:SetText(self.STRINGS.EMPTY_STRING);
         dashboard.timeToGoal:SetText(sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
     else
         local timeToGoal = self:GetTimeToGoalDisplay();
+        local goalProgress = self:GetGoalProgress();
         dashboard.goal:SetText(sformat("%s: %s", self.STRINGS.GOAL, GetMoneyString(goal, true)));
         dashboard.remaining:SetText(sformat("%s: %s", self.STRINGS.REMAINING, GetMoneyString(self:GetGoalRemaining(), true)));
-        dashboard.progress:SetText(sformat("%s: %s", self.STRINGS.PROGRESS, sformat("%.1f%%", self:GetGoalProgress() * 100)));
+        dashboard.progress.bar:SetValue(goalProgress);
+        dashboard.progress.bar.text:SetText(sformat("%.1f%%", goalProgress * 100));
         dashboard.timeToGoal:SetText(timeToGoal and
             sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, timeToGoal) or
             sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.UNAVAILABLE));
