@@ -10,7 +10,7 @@ function GoldPlanner:BuildDashboard()
     local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent, "BasicFrameTemplateWithInset");
     tinsert(UISpecialFrames, "GoldPlannerDashboard");
 
-    dashboard:SetSize(500, 350);
+    dashboard:SetSize(500, 500);
     dashboard:SetPoint("CENTER");
     dashboard:SetMovable(true);
     dashboard:EnableMouse(true);
@@ -34,29 +34,29 @@ function GoldPlanner:BuildDashboard()
     goldText:SetPoint("TOPLEFT", 20, -40);
     goldText:SetText("Gold");
 
-    local characterGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local characterGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     characterGold:SetPoint("TOPLEFT", 20, -60);
 
-    local warbandGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local warbandGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     warbandGold:SetPoint("TOPLEFT", 20, -80);
 
-    local totalGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local totalGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     totalGold:SetPoint("TOPLEFT", 20, -100);
 
     local goalText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     goalText:SetPoint("TOPLEFT", 20, -130);
     goalText:SetText("Goal");
 
-    local goal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local goal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     goal:SetPoint("TOPLEFT", 20, -150);
 
-    local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     remaining:SetPoint("TOPLEFT", 20, -170);
 
-    local offset = 5;
+    local progressInset = 5;
     local progress = CreateFrame("StatusBar", nil, dashboard, "BackdropTemplate");
     progress:SetPoint("TOPLEFT", 20, -190);
-    progress:SetSize(300, 30);
+    progress:SetSize(300, 25);
     progress:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -71,25 +71,25 @@ function GoldPlanner:BuildDashboard()
         },
     });
     progress.bar = CreateFrame("StatusBar", nil, progress);
-    progress.bar:SetPoint("TOPLEFT", offset, -offset);
-    progress.bar:SetPoint("BOTTOMRIGHT", -offset, offset);
+    progress.bar:SetPoint("TOPLEFT", progressInset, -progressInset);
+    progress.bar:SetPoint("BOTTOMRIGHT", -progressInset, progressInset);
     progress.bar:SetMinMaxValues(0, 1);
 
     local progressTexture = progress.bar:CreateTexture(nil, "ARTWORK");
     progressTexture:SetColorTexture(0.8, 0.55, 0);
     progress.bar:SetStatusBarTexture(progressTexture);
 
-    progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     progress.bar.text:SetPoint("CENTER");
 
     local statsText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     statsText:SetPoint("TOPLEFT", 20, -220);
     statsText:SetText("Statistics");
 
-    local rate = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local rate = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     rate:SetPoint("TOPLEFT", 20, -240);
 
-    local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     timeToGoal:SetPoint("TOPLEFT", 20, -260);
 
     GoldPlanner:BuildActivities(dashboard);

@@ -54,23 +54,27 @@ end
 
 function GoldPlanner:BuildActivities(parent)
     local activities = CreateFrame("Frame", nil, parent);
-    activities:SetPoint("TOPLEFT", 20, -340);
+    activities:SetPoint("TOPLEFT", 20, -300);
     activities:SetSize(460, 100);
 
     local activitiesTitle = activities:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     activitiesTitle:SetPoint("TOPLEFT", 0, 0);
     activitiesTitle:SetText("Activities");
 
+    local categoriesTitle = activities:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    categoriesTitle:SetPoint("TOPLEFT", 250, 0);
+    categoriesTitle:SetText("Categories");
+
     local activityList = self:GetActivities();
 
     for index, activity in ipairs(activityList) do
         local yOffset = -(index * 20);
 
-        local activityName = activities:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        local activityName = activities:CreateFontString(nil, "OVERLAY", "GameFontWhite");
         activityName:SetPoint("TOPLEFT", 0, yOffset);
         activityName:SetText(activity.name);
 
-        local activityCategory = activities:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        local activityCategory = activities:CreateFontString(nil, "OVERLAY", "GameFontWhite");
         activityCategory:SetPoint("TOPLEFT", 250, yOffset);
         activityCategory:SetText(activity.category);
 
