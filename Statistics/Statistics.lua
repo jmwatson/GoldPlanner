@@ -5,6 +5,9 @@ local HOUR = 3600;
 local MINUTE = 60;
 local STATISTICS_WINDOW = HOUR;
 
+local TIMESTAMP = 1;
+local COPPER = 2;
+
 local function FormatDuration(seconds)
     local days = math.floor(seconds / DAY);
     seconds = seconds % DAY;
@@ -31,13 +34,13 @@ function GoldPlanner:GetMoneyRate(windowSeconds)
     end
 
     local latest = history[#history];
-    local cutoff = latest.timestamp - windowSeconds;
+    local cutoff = latest[TIMESTAMP] - windowSeconds;
     local oldest = nil;
 
     for i = 1, #history do
         local snapshot = history[i];
 
-        if snapshot.timestamp >= cutoff then
+        if snapshot[TIMESTAMP] >= cutoff then
             oldest = snapshot;
             break;
         end
@@ -47,14 +50,14 @@ function GoldPlanner:GetMoneyRate(windowSeconds)
         oldest = history[1];
     end
 
-    local elapsed = latest.timestamp - oldest.timestamp;
+    local elapsed = latest[TIMESTAMP] - oldest[TIMESTAMP];
 
     -- Another window check to make sure we don't divide by zero
     if elapsed <= 0 then
         return nil;
     end
 
-    local copperDelta = latest.copper - oldest.copper;
+    local copperDelta = latest[COPPER] - oldest[COPPER];
 
     return {
         copperDelta = copperDelta,

@@ -2,15 +2,14 @@ local _, GoldPlanner = ...;
 local tinsert = table.insert;
 local totalHistoryPending = false;
 
+local COPPER = 2;
+
 local function AddHistorySnapshot(history, copper)
     local lastSnapshot = history[#history];
-    local snapshot = {
-        timestamp = time(),
-        copper = copper,
-    };
+    local snapshot = { time(), copper };
 
     -- Don't record enteries if nothing has changed
-    if lastSnapshot and lastSnapshot.copper == snapshot.copper then
+    if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
         return;
     end
 
