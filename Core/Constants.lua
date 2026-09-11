@@ -15,6 +15,34 @@ GoldPlanner.COLORS = {
     COPPER = "B87333",
 };
 
-function GoldPlanner:ColorizeText(text, color)
+GoldPlanner.STRINGS = {
+    EMPTY_STRING = "",
+
+    SLASH_COMMAND = "/goldplanner",
+    SLASH_COMMAND_SHORT = "/gp",
+
+    ADDON_TITLE = "Gold Planner",
+
+    CHARACTER_GOLD = "Character",
+    WARBAND_GOLD = "Warband",
+    TOTAL_GOLD = "Total",
+
+    GOAL = "Goal",
+    REMAINING = "Remaining",
+    PROGRESS = "Progress",
+    NO_GOAL = "No goal set",
+
+    RATE = "Rate",
+    TIME_TO_GOAL = "Time to Goal",
+    NOT_ENOUGH_DATA = "Not enough data",
+    UNAVAILABLE = "Unavailable",
+    REACHED = "Reached",
+};
+
+function GoldPlanner:ColorText(text, color)
     return string.format("|cff%s%s|r", color, text);
+end
+
+function GoldPlanner:Log(...)
+    print(self:ColorText(self.name, self.COLORS.GOLD) .. ":", ...);
 end

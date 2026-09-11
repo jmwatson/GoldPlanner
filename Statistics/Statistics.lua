@@ -1,5 +1,27 @@
 local _, GoldPlanner = ...;
 
+local DAY = 86400;
+local HOUR = 3600;
+local MINUTE = 60;
+local STATISTICS_WINDOW = HOUR;
+
+local function FormatDuration(seconds)
+    local days = math.floor(seconds / DAY);
+    seconds = seconds % DAY;
+
+    local hours = math.floor(seconds / HOUR);
+    seconds = seconds % HOUR;
+
+    local minutes = math.floor(seconds / MINUTE);
+    if days > 0 then
+        return string.format("%dd %dh %dm", days, hours, minutes);
+    elseif hours > 0 then
+        return string.format("%dh %dm", hours, minutes);
+    end
+
+    return string.format("%dm", minutes);
+end
+
 function GoldPlanner:GetMoneyRate(windowSeconds)
     local history = self.db.totalHistory;
 
@@ -53,4 +75,36 @@ function GoldPlanner:GetTimeToAmount(currentCopper, targetCopper, rate)
     end
 
     return copperDelta / rate;
+end
+
+function GoldPlanner:GetMoneyRateDisplay()
+    local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
+
+    if not statistics then
+        return nil;
+    end
+
+    local windowRate = statistics.rate * STATISTICS_WINDOW;
+
+    return GetMoneyString(windowRate, true);
+end
+
+function GoldPlanner:GetTimeToGoalDisplay()
+    local goal = self:GetGoal();
+    local totalCopper = self:GetTotalCopper();
+    local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
+
+    if (goal <= 0) or (not statistics or statistics.rate <= 0) then
+        return nil;
+    elseif totalCopper >= goal then
+        return self.STRINGS.REACHED;
+    end
+
+    local seconds = self:GetTimeToAmount(totalCopper, goal, statistics.rate);
+
+    if not seconds then
+        return nil;
+    end
+    
+    return FormatDuration(seconds);
 end

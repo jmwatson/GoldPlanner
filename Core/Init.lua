@@ -4,19 +4,35 @@ local EVENTS = GoldPlanner.EVENTS;
 GoldPlanner.name = ADDON_NAME;
 GoldPlanner.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version");
 
-local function log(...)
-    local message = string.format(...);
-    print("|cffffd100" .. ADDON_NAME .. "|r: " .. message);
+local function HandleSlashCommand(parameters)
+    local command, value = parameters:match("^(%S+)%s*(.*)$");
+    local usage = "Usage: /gp goal <gold amount>";
+
+    if command == "goal" then
+        local gold = tonumber(value);
+
+        if not gold or gold <= 0 then
+            GoldPlanner:Log(usage);
+            return;
+        end
+
+        GoldPlanner:SetGoal(gold * 10000);
+        GoldPlanner:UpdateDashboard();
+
+        GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
+    else
+        GoldPlanner:ToggleDashboard();
+    end
 end
 
-local eventFrame = CreateFrame("Frame");
+local function RegisterSlashCommands()
+    SLASH_GOLDPLANNER1 = GoldPlanner.STRINGS.SLASH_COMMAND;
+    SLASH_GOLDPLANNER2 = GoldPlanner.STRINGS.SLASH_COMMAND_SHORT;
 
-eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
-eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
-eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
-eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
+    SlashCmdList["GOLDPLANNER"] = HandleSlashCommand;
+end
 
-eventFrame:SetScript("OnEvent", function(self, event, ...)
+local function HandleEvents(self, event, ...)
     if event == EVENTS.ADDON_LOADED then
         local loadedAddonName = ...;
 
@@ -25,24 +41,24 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
         end
 
         GoldPlanner:InitializeDatabase();
-
-        log("v" .. GoldPlanner.version .. " loaded.");
+        GoldPlanner:BuildDashboard();
+        RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
-        
-        log("Character: " .. GetMoneyString(GoldPlanner:GetCharacter().copper, true));
-        log("Warband: " .. GetMoneyString(GoldPlanner.db.warband.copper, true));
-        log("Total: " .. GetMoneyString(GoldPlanner:GetTotalCopper(), true));
+        GoldPlanner:UpdateDashboard();
     elseif event == EVENTS.PLAYER_MONEY then
-        -- log("PLAYER_MONEY");
         GoldPlanner:UpdateCharacterCopper();
-        -- log("Character: " .. GetMoneyString(GoldPlanner:GetCharacter().copper, true));
-        -- log("Total: " .. GetMoneyString(GoldPlanner:GetTotalCopper(), true));
+        GoldPlanner:UpdateDashboard();
     elseif event == EVENTS.ACCOUNT_MONEY then
-        -- log("ACCOUNT_MONEY");
         GoldPlanner:UpdateWarbandCopper();
-        -- log("Warband: " .. GetMoneyString(GoldPlanner.db.warband.copper, true));
-        -- log("Total: " .. GetMoneyString(GoldPlanner:GetTotalCopper(), true));
+        GoldPlanner:UpdateDashboard();
     end
-end);
+end
+
+local eventFrame = CreateFrame("Frame");
+eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
+eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
+eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
+eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
+eventFrame:SetScript("OnEvent", HandleEvents);
