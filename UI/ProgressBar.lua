@@ -1,15 +1,22 @@
 local _, GoldPlanner = ...;
 
+local function TrimGold(copper)
+    return math.floor(copper / 10000) * 10000;
+end
+
 function GoldPlanner:BuildProgressBar()
     if self.progressBar then
         return;
     end
 
+    local settings = GoldPlanner.db.settings.progressBar;
+
     local frame = CreateFrame("Frame", "GoldPlannerProgressBar", UIParent);
-    frame:SetSize(500, 20);
-    frame:SetPoint("TOP");
+    frame:SetSize(settings.width, settings.height);
+    frame:SetPoint(settings.point, UIParent, settings.point, settings.x, settings.y);
     frame:SetMovable(true);
-    frame:EnableMouse(true);
+    frame:SetClampedToScreen(true);
+    frame:EnableMouse(not settings.locked);
     frame:RegisterForDrag("RightButton");
 
     frame:SetScript("OnDragStart", function(self)
@@ -18,55 +25,29 @@ function GoldPlanner:BuildProgressBar()
 
     frame:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing();
+        GoldPlanner:SaveProgressBarPosition();
     end);
 
     frame:Show();
 
-    local progress = CreateFrame("StatusBar", nil, frame);
-    progress:SetPoint("TOPLEFT", 3, -3);
-    progress:SetSize(494, 14);
+    local inset = 3;
+    local progress = CreateFrame("StatusBar", nil, frame, "BackdropTemplate");
+    progress:SetPoint("TOPLEFT", inset, -inset);
+    progress:SetPoint("BOTTOMRIGHT", -inset, inset);
+    progress:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    });
+    progress:SetBackdropBorderColor(settings.borderColor[1], settings.borderColor[2], settings.borderColor[3], settings.borderColor[4]);
 
-    local background = progress:CreateTexture(nil, "BACKGROUND");
-    background:SetAllPoints(progress);
-    background:SetColorTexture(0, 0, 0, 0.7);
-
-    local progressInset = 1;
+    local barInset = 1;
     progress.bar = CreateFrame("StatusBar", nil, progress);
-    progress.bar:SetPoint("TOPLEFT", progressInset, -progressInset);
-    progress.bar:SetPoint("BOTTOMRIGHT", -progressInset, progressInset);
+    progress.bar:SetPoint("TOPLEFT", barInset, -barInset);
+    progress.bar:SetPoint("BOTTOMRIGHT", -barInset, barInset);
     progress.bar:SetMinMaxValues(0, 1);
     progress.bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar");
-    progress.bar:SetStatusBarColor(0.8, 0.55, 0);
-
-    local TICK_COUNT = 10;
-    local barWidth = 494;
-
-    for i = 1, TICK_COUNT - 1 do
-        local tick = progress.bar:CreateTexture(nil, "OVERLAY");
-        tick:SetColorTexture(0, 0, 0, 0.5);
-        tick:SetSize(2, 14);
-        tick:SetPoint("LEFT", progress.bar, "LEFT", (barWidth / TICK_COUNT) * i, 0);
-    end
-
-    local BORDER_TEXTURE = "Interface\\PaperDollInfoFrame\\UI-Character-Skills-BarBorder";
-
-    local borderLeft = frame:CreateTexture(nil, "OVERLAY");
-    borderLeft:SetTexture(BORDER_TEXTURE);
-    borderLeft:SetSize(9, 22);
-    borderLeft:SetTexCoord(0.007843, 0.043137, 0.193548, 0.774193);
-    borderLeft:SetPoint("LEFT", progress, "LEFT", -3, 0);
-
-    local borderRight = frame:CreateTexture(nil, "OVERLAY");
-    borderRight:SetTexture(BORDER_TEXTURE);
-    borderRight:SetSize(9, 22);
-    borderRight:SetTexCoord(0.043137, 0.007843, 0.193548, 0.774193);
-    borderRight:SetPoint("RIGHT", progress, "RIGHT", 3, 0);
-
-    local borderMid = frame:CreateTexture(nil, "OVERLAY");
-    borderMid:SetTexture(BORDER_TEXTURE);
-    borderMid:SetTexCoord(0.113726, 0.1490196, 0.193548, 0.774193);
-    borderMid:SetPoint("TOPLEFT", borderLeft, "TOPRIGHT", 0, 0);
-    borderMid:SetPoint("BOTTOMRIGHT", borderRight, "BOTTOMLEFT", 0, 0);
+    progress.bar:SetStatusBarColor(settings.fillColor[1], settings.fillColor[2], settings.fillColor[3]);
 
     progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "TextStatusBarText");
     progress.bar.text:SetPoint("CENTER");
@@ -83,9 +64,8 @@ function GoldPlanner:UpdateProgressBar()
         return;
     end
 
-    local function TrimToGold(money) return math.floor(money / 10000) * 10000; end
-    local frame = self.progressBar;
     local sformat = string.format;
+    local frame = self.progressBar;
     local goal = self:GetGoal();
     local total = self:GetTotalCopper();
 
@@ -94,7 +74,82 @@ function GoldPlanner:UpdateProgressBar()
         frame.progress.bar.text:SetText(self.STRINGS.EMPTY_STRING);
     else
         local goalProgress = self:GetGoalProgress();
+        local text = frame:GetWidth() >= 200 and
+            sformat("%s / %s", GetMoneyString(TrimGold(total), true), GetMoneyString(TrimGold(goal), true)) or
+            sformat("%.1f%%", goalProgress * 100);
         frame.progress.bar:SetValue(goalProgress);
-        frame.progress.bar.text:SetText(sformat("%s / %s", GetMoneyString(TrimToGold(total), true), GetMoneyString(TrimToGold(goal), true)));
+        frame.progress.bar.text:SetText(text);
+    end
+end
+
+function GoldPlanner:ApplyProgressBarSettings()
+    local frame = self.progressBar;
+
+    if frame then
+        local settings = self.db.settings.progressBar;
+
+        frame:ClearAllPoints();
+        frame:SetPoint(settings.point, UIParent, settings.point, settings.x, settings.y);
+        frame:SetSize(settings.width, settings.height);
+        frame:EnableMouse(not settings.locked);
+        frame:SetShown(settings.show);
+
+        GoldPlanner:SetProgressBarBorderColor(settings.borderColor);
+        GoldPlanner:SetProgressBarColor(settings.fillColor);
+    end
+end
+
+
+function GoldPlanner:SetProgressBarSize(width, height)
+    if self.progressBar then
+        self.db.settings.progressBar.width = width;
+        self.db.settings.progressBar.height = height;
+        self.progressBar:SetSize(width, height);
+    end
+end
+
+function GoldPlanner:SetProgressBarColor(fill)
+    if self.progressBar then
+        self.db.settings.progressBar.fillColor = fill;
+        self.progressBar.progress.bar:SetStatusBarColor(fill[1], fill[2], fill[3]);
+    end
+end
+
+function GoldPlanner:SetProgressBarBorderColor(border)
+    if self.progressBar then
+        self.db.settings.progressBar.borderColor = border;
+        self.progressBar.progress:SetBackdropBorderColor(border[1], border[2], border[3], border[4]);
+    end
+end
+
+function GoldPlanner:SetProgressBarLocked(lock)
+    if self.progressBar then
+        self.db.settings.progressBar.locked = not lock;
+        self.progressBar.progress.bar:EnableMouse(lock);
+    end
+end
+
+function GoldPlanner:ShowProgressBar(show)
+    if self.progressBar then
+        self.db.settings.progressBar.show = show;
+
+        if show then
+            self.progressBar:Show();
+        else
+            self.progressBar:Hide();
+        end
+    end
+end
+
+function GoldPlanner:SaveProgressBarPosition()
+    local frame = self.progressBar;
+
+    if frame then
+        local point, _, _, x, y = frame:GetPoint();
+        local settings = self.db.settings.progressBar;
+
+        settings.point = point;
+        settings.x = x;
+        settings.y = y;
     end
 end
