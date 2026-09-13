@@ -1,4 +1,4 @@
-local _, addon = ...;
+local _, GoldPlanner = ...;
 
 local DEFAULT_DATABASE = {
     version = 1,
@@ -11,6 +11,19 @@ local DEFAULT_DATABASE = {
     totalHistory = {},
     goal = {
         copper = 0,
+    },
+    settings = {
+        progressBar = {
+            point = "TOP",
+            x = 0,
+            y = 0,
+            width = 550,
+            height = 14,
+            fillColor = { 0.8, 0.55, 0 },
+            borderColor = { 0, 0, 0, 1 },
+            locked = false,
+            show = true,
+        },
     },
 };
 
@@ -29,7 +42,7 @@ local function CopyDefaults(source, target)
     end
 end
 
-function addon:InitializeDatabase()
+function GoldPlanner:InitializeDatabase()
     if not GoldPlannerDB then
         GoldPlannerDB = {};
     end
@@ -37,4 +50,14 @@ function addon:InitializeDatabase()
     CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
 
     self.db = GoldPlannerDB;
+end
+
+function GoldPlanner:ResetProgressBar()
+    if not GoldPlannerDB then
+        self:InitializeDatabase();
+    end
+
+    local defaults = {}
+    CopyDefaults(DEFAULT_DATABASE.settings.progressBar, defaults);
+    self.db.settings.progressBar = defaults;
 end

@@ -4,6 +4,62 @@ local EVENTS = GoldPlanner.EVENTS;
 GoldPlanner.name = ADDON_NAME;
 GoldPlanner.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version");
 
+local function HandleBarCommand(value)
+    local subcommand, rest = value:match("^(%S+)%s*(.*)$");
+ 
+    if subcommand == "lock" then
+        GoldPlanner:SetProgressBarLocked(true);
+        GoldPlanner:Log("Progress bar locked.");
+    elseif subcommand == "unlock" then
+        GoldPlanner:SetProgressBarLocked(false);
+        GoldPlanner:Log("Progress bar unlocked.");
+    elseif subcommand == "size" then
+        local width, height = rest:match("^(%d+)%s+(%d+)$");
+        width, height = tonumber(width), tonumber(height);
+ 
+        if not width or not height then
+            GoldPlanner:Log("Usage: /gp bar size <width> <height>");
+            return;
+        end
+ 
+        GoldPlanner:SetProgressBarSize(width, height);
+        GoldPlanner:Log(string.format("Progress bar resized to %dx%d.", width, height));
+    elseif subcommand == "color" then
+        local r, g, b = rest:match("^([%d.]+)%s+([%d.]+)%s+([%d.]+)$");
+        r, g, b = tonumber(r), tonumber(g), tonumber(b);
+ 
+        if not r or not g or not b then
+            GoldPlanner:Log("Usage: /gp bar color <r> <g> <b> (each 0-1)");
+            return;
+        end
+ 
+        GoldPlanner:SetProgressBarColor(r, g, b);
+        GoldPlanner:Log("Progress bar color updated.");
+    elseif subcommand == "bordercolor" then
+        local r, g, b = rest:match("^([%d.]+)%s+([%d.]+)%s+([%d.]+)$");
+        r, g, b = tonumber(r), tonumber(g), tonumber(b);
+ 
+        if not r or not g or not b then
+            GoldPlanner:Log("Usage: /gp bar bordercolor <r> <g> <b> (each 0-1)");
+            return;
+        end
+ 
+        GoldPlanner:SetProgressBarBorderColor(r, g, b);
+        GoldPlanner:Log("Progress bar border color updated.");
+    elseif subcommand == "reset" then
+        GoldPlanner:ResetProgressBar();
+        GoldPlanner:ApplyProgressBarSettings();
+        GoldPlanner:Log("Progress bar reset to defaults.");
+    elseif subcommand == "show" then
+        GoldPlanner:ShowProgressBar(true);
+    elseif subcommand == "hide" then
+        GoldPlanner:ShowProgressBar(false);
+    else
+        GoldPlanner:Log("Usage: /gp bar <lock|unlock|size|color|bordercolor|show|hide|reset>");
+    end
+end
+
+
 local function HandleSlashCommand(parameters)
     local command, value = parameters:match("^(%S+)%s*(.*)$");
     local usage = "Usage: /gp goal <gold amount>";
@@ -18,8 +74,11 @@ local function HandleSlashCommand(parameters)
 
         GoldPlanner:SetGoal(gold * 10000);
         GoldPlanner:UpdateDashboard();
+        GoldPlanner:UpdateProgressBar();
 
         GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
+    elseif command == "bar" then
+        HandleBarCommand(value);
     else
         GoldPlanner:ToggleDashboard();
     end
@@ -43,17 +102,21 @@ local function HandleEvents(self, event, ...)
         GoldPlanner:InitializeDatabase();
         GoldPlanner:CompactAllHistory();
         GoldPlanner:BuildDashboard();
+        GoldPlanner:BuildProgressBar();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
         GoldPlanner:UpdateDashboard();
+        GoldPlanner:UpdateProgressBar();
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateDashboard();
+        GoldPlanner:UpdateProgressBar();
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
         GoldPlanner:UpdateDashboard();
+        GoldPlanner:UpdateProgressBar();
     end
 end
 
