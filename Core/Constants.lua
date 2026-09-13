@@ -34,6 +34,8 @@ GoldPlanner.STRINGS = {
 
     RATE = "Rate",
     TIME_TO_GOAL = "Time to Goal",
+    DAILY_GOAL = "Daily Goal",
+    NO_DEADLINE = "No deadline set",
     NOT_ENOUGH_DATA = "Not enough data",
     UNAVAILABLE = "Unavailable",
     REACHED = "Reached",
@@ -47,6 +49,6 @@ function GoldPlanner:Log(...)
     print(self:ColorText(self.name, self.COLORS.GOLD) .. ":", ...);
 end
 
-function GoldPlanner:TrimGold(copper)
+function GoldPlanner.TrimGold(copper)
     return math.floor(copper / 10000) * 10000;
 end
