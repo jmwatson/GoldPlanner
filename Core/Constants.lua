@@ -46,3 +46,7 @@ end
 function GoldPlanner:Log(...)
     print(self:ColorText(self.name, self.COLORS.GOLD) .. ":", ...);
 end
+
+function GoldPlanner:TrimGold(copper)
+    return math.floor(copper / 10000) * 10000;
+end

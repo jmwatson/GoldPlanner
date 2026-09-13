@@ -1,8 +1,6 @@
 local _, GoldPlanner = ...;
 
-local function TrimGold(copper)
-    return math.floor(copper / 10000) * 10000;
-end
+local trim = GoldPlanner.TrimGold;
 
 function GoldPlanner:BuildProgressBar()
     if self.progressBar then
@@ -75,7 +73,7 @@ function GoldPlanner:UpdateProgressBar()
     else
         local goalProgress = self:GetGoalProgress();
         local text = frame:GetWidth() >= 200 and
-            sformat("%s / %s", GetMoneyString(TrimGold(total), true), GetMoneyString(TrimGold(goal), true)) or
+            sformat("%s / %s", GetMoneyString(trim(total), true), GetMoneyString(trim(goal), true)) or
             sformat("%.1f%%", goalProgress * 100);
         frame.progress.bar:SetValue(goalProgress);
         frame.progress.bar.text:SetText(text);
