@@ -41,6 +41,7 @@ local function HandleEvents(self, event, ...)
         end
 
         GoldPlanner:InitializeDatabase();
+        GoldPlanner:CompactAllHistory();
         GoldPlanner:BuildDashboard();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then

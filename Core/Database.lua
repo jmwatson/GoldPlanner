@@ -2,6 +2,7 @@ local _, addon = ...;
 
 local DEFAULT_DATABASE = {
     version = 1,
+    lastCompaction = nil;
     characters = {},
     warband = {
         copper = 0,
