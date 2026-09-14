@@ -4,6 +4,8 @@ local EVENTS = GoldPlanner.EVENTS;
 GoldPlanner.name = ADDON_NAME;
 GoldPlanner.version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version");
 
+local SECONDS_PER_DAY = 86400;
+
 local function HandleBarCommand(value)
     local subcommand, rest = value:match("^(%S+)%s*(.*)$");
  
@@ -62,14 +64,20 @@ end
 
 local function HandleSlashCommand(parameters)
     local command, value = parameters:match("^(%S+)%s*(.*)$");
-    local usage = "Usage: /gp goal <gold amount>";
+    local usage = "Usage: /gp goal <gold amount> [days]";
 
     if command == "goal" then
-        local gold = tonumber(value);
+        local amount, days = value:match("^(%S+)%s*(%S*)$");
+        local gold = tonumber(amount);
+        local days = tonumber(days);
 
         if not gold or gold <= 0 then
             GoldPlanner:Log(usage);
             return;
+        end
+
+        if days and days > 0 then
+            GoldPlanner:SetGoalDeadline(time() + days * SECONDS_PER_DAY);
         end
 
         GoldPlanner:SetGoal(gold * 10000);

@@ -53,7 +53,8 @@ function GoldPlanner:BuildDashboard()
     local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     remaining:SetPoint("TOPLEFT", 20, -170);
 
-    local progressInset = 5;
+    local progressInset = 3;
+    local barInset = 5;
     local progress = CreateFrame("StatusBar", nil, dashboard, "BackdropTemplate");
     progress:SetPoint("TOPLEFT", 20, -190);
     progress:SetSize(300, 25);
@@ -64,15 +65,15 @@ function GoldPlanner:BuildDashboard()
         tileSize = 16,
         edgeSize = 12,
         insets = {
-            left = 3,
-            right = 3,
-            top = 3,
-            bottom = 3,
+            left = progressInset,
+            right = progressInset,
+            top = progressInset,
+            bottom = progressInset,
         },
     });
     progress.bar = CreateFrame("StatusBar", nil, progress);
-    progress.bar:SetPoint("TOPLEFT", progressInset, -progressInset);
-    progress.bar:SetPoint("BOTTOMRIGHT", -progressInset, progressInset);
+    progress.bar:SetPoint("TOPLEFT", barInset, -barInset);
+    progress.bar:SetPoint("BOTTOMRIGHT", -barInset, barInset);
     progress.bar:SetMinMaxValues(0, 1);
 
     local progressTexture = progress.bar:CreateTexture(nil, "ARTWORK");
@@ -92,7 +93,10 @@ function GoldPlanner:BuildDashboard()
     local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     timeToGoal:SetPoint("TOPLEFT", 20, -260);
 
-    GoldPlanner:BuildActivities(dashboard);
+    local dailyGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    dailyGoal:SetPoint("TOPLEFT", 20, -280);
+
+    GoldPlanner:BuildActivities(dashboard, dailyGoal);
 
     dashboard.characterGold = characterGold;
     dashboard.warbandGold = warbandGold;
@@ -102,6 +106,7 @@ function GoldPlanner:BuildDashboard()
     dashboard.progress = progress;
     dashboard.rate = rate;
     dashboard.timeToGoal = timeToGoal;
+    dashboard.dailyGoal = dailyGoal;
 
     self.dashboard = dashboard;
 
@@ -142,6 +147,11 @@ function GoldPlanner:UpdateDashboard()
     dashboard.rate:SetText(rateDisplay and
         sformat("%s: %s/hour", self.STRINGS.RATE, rateDisplay) or
         sformat("%s: %s", self.STRINGS.RATE, self.STRINGS.NOT_ENOUGH_DATA));
+
+    local dailyGoalDisplay = self:GetDailyGoalDisplay();
+    dashboard.dailyGoal:SetText(dailyGoalDisplay and
+        sformat("%s: %s", self.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
+        sformat("%s: %s", self.STRINGS.DAILY_GOAL, self.STRINGS.NO_DEADLINE));
 end
 
 function GoldPlanner:ToggleDashboard()

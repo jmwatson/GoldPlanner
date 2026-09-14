@@ -25,6 +25,32 @@ local function FormatDuration(seconds)
     return string.format("%dm", minutes);
 end
 
+function GoldPlanner:GetCopperAt(history, timestamp)
+    local first = history[1]
+
+    if timestamp <= first[TIMESTAMP] then
+        return first[COPPER];
+    end
+
+    for i = 1, #history - 1 do
+        first = history[i];
+        local second = history[i + 1];
+
+        if first[TIMESTAMP] <= timestamp and timestamp <= second[TIMESTAMP] then
+            local span = second[TIMESTAMP] - first[TIMESTAMP];
+
+            if span <= 0 then
+                return first[COPPER];
+            end
+
+            local progress = (timestamp - first[TIMESTAMP]) / span;
+            return first[COPPER] + (second[COPPER] - first[COPPER]) * progress;
+        end
+    end
+
+    return history[#history][COPPER];
+end
+
 function GoldPlanner:GetMoneyRate(windowSeconds)
     local history = self.db.totalHistory;
 
@@ -64,6 +90,56 @@ function GoldPlanner:GetMoneyRate(windowSeconds)
         elapsed = elapsed,
         rate = copperDelta / elapsed,
     };
+end
+
+function GoldPlanner:GetCopperEarnedSince(timestamp)
+    local history = self.db.totalHistory;
+
+    if #history < 1 then
+        return 0;
+    end
+
+    local startCopper = self:GetCopperAt(history, timestamp)
+    return self:GetTotalCopper() - startCopper;
+end
+
+local function GetStartOfToday()
+    local today = date("*t");
+    today.hour = 0;
+    today.min = 0;
+    today.sec = 0;
+    return time(today);
+end
+
+function GoldPlanner:GetDailyGoalProgress()
+    local dailyGoal = self:GetDailyGoal();
+
+    if not dailyGoal or dailyGoal <= 0 then
+        return nil;
+    end
+
+    local earnedToday = self:GetCopperEarnedSince(GetStartOfToday());
+
+    return {
+        target = dailyGoal,
+        earned = earnedToday,
+        remaining = math.max(dailyGoal - earnedToday, 0);
+        progress = math.min(earnedToday / dailyGoal, 1);
+    };
+end
+
+function GoldPlanner:GetDailyGoalDisplay()
+    local trim = GoldPlanner.TrimGold;
+    local daily = self:GetDailyGoalProgress();
+
+    if not daily then
+        return nil;
+    end
+
+    local earned = trim(daily.earned);
+    local target = trim(daily.target);
+
+    return string.format("%s / %s today", GetMoneyString(earned, true), GetMoneyString(target, true));
 end
 
 function GoldPlanner:GetTimeToAmount(currentCopper, targetCopper, rate)
