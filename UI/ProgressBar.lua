@@ -122,8 +122,8 @@ end
 
 function GoldPlanner:SetProgressBarLocked(lock)
     if self.progressBar then
-        self.db.settings.progressBar.locked = not lock;
-        self.progressBar.progress.bar:EnableMouse(lock);
+        self.db.settings.progressBar.locked = lock;
+        self.progressBar:EnableMouse(not lock);
     end
 end
 

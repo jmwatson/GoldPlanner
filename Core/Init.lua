@@ -61,7 +61,6 @@ local function HandleBarCommand(value)
     end
 end
 
-
 local function HandleSlashCommand(parameters)
     local command, value = parameters:match("^(%S+)%s*(.*)$");
     local usage = "Usage: /gp goal <gold amount> [days]";
