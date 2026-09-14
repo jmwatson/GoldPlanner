@@ -96,7 +96,7 @@ function GoldPlanner:BuildDashboard()
     local dailyGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     dailyGoal:SetPoint("TOPLEFT", 20, -280);
 
-    GoldPlanner:BuildActivities(dashboard);
+    GoldPlanner:BuildActivities(dashboard, dailyGoal);
 
     dashboard.characterGold = characterGold;
     dashboard.warbandGold = warbandGold;

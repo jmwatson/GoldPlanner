@@ -99,7 +99,7 @@ function GoldPlanner:GetCopperEarnedSince(timestamp)
         return 0;
     end
 
-    local startCopper = GetCopperAt(history, timestamp)
+    local startCopper = self:GetCopperAt(history, timestamp)
     return self:GetTotalCopper() - startCopper;
 end
 

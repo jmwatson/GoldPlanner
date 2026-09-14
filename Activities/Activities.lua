@@ -52,9 +52,9 @@ function GoldPlanner:GetActivity(id)
     return nil;
 end
 
-function GoldPlanner:BuildActivities(parent)
+function GoldPlanner:BuildActivities(parent, anchor)
     local activities = CreateFrame("Frame", nil, parent);
-    activities:SetPoint("TOPLEFT", 20, -300);
+    activities:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -20);
     activities:SetSize(460, 100);
 
     local activitiesTitle = activities:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
