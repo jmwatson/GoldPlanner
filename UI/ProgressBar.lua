@@ -26,7 +26,7 @@ function GoldPlanner:BuildProgressBar()
         GoldPlanner:SaveProgressBarPosition();
     end);
 
-    frame:Show();
+    frame:SetShown(settings.show);
 
     local inset = 3;
     local progress = CreateFrame("StatusBar", nil, frame, "BackdropTemplate");
@@ -130,12 +130,7 @@ end
 function GoldPlanner:ShowProgressBar(show)
     if self.progressBar then
         self.db.settings.progressBar.show = show;
-
-        if show then
-            self.progressBar:Show();
-        else
-            self.progressBar:Hide();
-        end
+        self.progressBar:SetShown(show);
     end
 end
 

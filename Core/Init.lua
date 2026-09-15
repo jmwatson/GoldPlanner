@@ -86,6 +86,8 @@ local function HandleSlashCommand(parameters)
         GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
     elseif command == "bar" then
         HandleBarCommand(value);
+    elseif command == "settings" then
+        Settings.OpenToCategory(GoldPlanner.settingsCategory:GetID());
     else
         GoldPlanner:ToggleDashboard();
     end
@@ -108,6 +110,7 @@ local function HandleEvents(self, event, ...)
 
         GoldPlanner:InitializeDatabase();
         GoldPlanner:CompactAllHistory();
+        GoldPlanner:BuildSettings();
         GoldPlanner:BuildDashboard();
         GoldPlanner:BuildProgressBar();
         RegisterSlashCommands();

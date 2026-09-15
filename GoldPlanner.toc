@@ -15,5 +15,6 @@ Statistics/Statistics.lua
 Goals/Goals.lua
 Activities/Activities.lua
 
+UI/Settings.lua
 UI/Dashboard.lua
 UI/ProgressBar.lua
