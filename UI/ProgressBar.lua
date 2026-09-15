@@ -38,6 +38,7 @@ function GoldPlanner:BuildProgressBar()
         edgeSize = 1,
     });
     progress:SetBackdropBorderColor(settings.borderColor[1], settings.borderColor[2], settings.borderColor[3], settings.borderColor[4]);
+    progress:SetBackdropColor(0, 0, 0, 0.3);
 
     local barInset = 1;
     progress.bar = CreateFrame("StatusBar", nil, progress);
