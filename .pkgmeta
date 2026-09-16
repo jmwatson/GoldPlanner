@@ -1,4 +1,7 @@
 package-as: GoldPlanner
+
 ignore:
   - .github
-  - "*.md"
+  - .pkgmeta
+  - README.md
+  - LICENSE
