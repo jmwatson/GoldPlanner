@@ -177,14 +177,14 @@ function GoldPlanner:BuildSettings()
         deadlineEditBox:SetText(deadline and tostring(math.floor((GoldPlanner.db.goal.deadline - time()) / 86400)) or "");
     end);
 
-    local progrerssBarCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Progress Bar");
-    Settings.RegisterAddOnCategory(progrerssBarCategory);
+    local progressBarCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Progress Bar");
+    Settings.RegisterAddOnCategory(progressBarCategory);
 
     local progressBarSettings = self.db.settings.progressBar;
-    BuildShowProgressBar(addonName, progrerssBarCategory, progressBarSettings);
-    BuildLockProgressBar(addonName, progrerssBarCategory, progressBarSettings);
-    BuildProgressWidth(addonName, progrerssBarCategory, progressBarSettings);
-    BuildProgressHeight(addonName, progrerssBarCategory, progressBarSettings);
+    BuildShowProgressBar(addonName, progressBarCategory, progressBarSettings);
+    BuildLockProgressBar(addonName, progressBarCategory, progressBarSettings);
+    BuildProgressWidth(addonName, progressBarCategory, progressBarSettings);
+    BuildProgressHeight(addonName, progressBarCategory, progressBarSettings);
 
     self.settingsCategory = category;
 end
