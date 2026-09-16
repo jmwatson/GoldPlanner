@@ -1,0 +1,4 @@
+package-as: GoldPlanner
+ignore:
+  - .github
+  - "*.md"
