@@ -26,7 +26,7 @@ function GoldPlanner:BuildProgressBar()
         GoldPlanner:SaveProgressBarPosition();
     end);
 
-    frame:Show();
+    frame:SetShown(settings.show);
 
     local inset = 3;
     local progress = CreateFrame("StatusBar", nil, frame, "BackdropTemplate");
@@ -38,6 +38,7 @@ function GoldPlanner:BuildProgressBar()
         edgeSize = 1,
     });
     progress:SetBackdropBorderColor(settings.borderColor[1], settings.borderColor[2], settings.borderColor[3], settings.borderColor[4]);
+    progress:SetBackdropColor(0, 0, 0, 0.3);
 
     local barInset = 1;
     progress.bar = CreateFrame("StatusBar", nil, progress);
@@ -122,20 +123,15 @@ end
 
 function GoldPlanner:SetProgressBarLocked(lock)
     if self.progressBar then
-        self.db.settings.progressBar.locked = not lock;
-        self.progressBar.progress.bar:EnableMouse(lock);
+        self.db.settings.progressBar.locked = lock;
+        self.progressBar:EnableMouse(not lock);
     end
 end
 
 function GoldPlanner:ShowProgressBar(show)
     if self.progressBar then
         self.db.settings.progressBar.show = show;
-
-        if show then
-            self.progressBar:Show();
-        else
-            self.progressBar:Hide();
-        end
+        self.progressBar:SetShown(show);
     end
 end
 
