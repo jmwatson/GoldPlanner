@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed so the packager can create a GitHub Release and upload the zip
     steps:
       - name: Clone project
         uses: actions/checkout@v4
@@ -18,7 +20,7 @@ jobs:
           # Uncomment and add these as repo secrets (Settings > Secrets and variables > Actions)
           # if/when you want to auto-upload to these sites. Safe to leave unset for now -
           # the packager will just skip any site whose token isn't provided.
-          # CF_API_KEY: ${{ secrets.CF_API_KEY }}         # CurseForge
-          # WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }} # WoWInterface
-          # WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }} # Wago
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}     # Attaches the zip to the GitHub Release
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}         # CurseForge
+          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }} # WoWInterface
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }} # Wago
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}     # Attaches the zip to the GitHub Release (must be named GITHUB_OAUTH, not GITHUB_TOKEN)
