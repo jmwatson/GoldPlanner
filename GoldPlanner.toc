@@ -9,12 +9,15 @@ Core/Constants.lua
 Core/Utils.lua
 Core/Init.lua
 Core/Database.lua
+Core/RuntimeData.lua
 Core/Gold.lua
 
 History/History.lua
 Statistics/Statistics.lua
 Goals/Goals.lua
+
 Activities/Activities.lua
+Activities/WorldQuests.lua
 
 UI/Settings.lua
 UI/Dashboard.lua
