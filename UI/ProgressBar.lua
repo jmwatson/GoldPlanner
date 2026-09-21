@@ -72,7 +72,6 @@ function GoldPlanner:UpdateProgressBar()
     if goal <= 0 then
         bar:SetValue(0);
         bar.text:SetText(self.STRINGS.EMPTY_STRING);
-        stats.timeToGoal:SetText(sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
     else
         local goalProgress = self:GetGoalProgress();
         local text = frame:GetWidth() >= 200 and
