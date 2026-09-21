@@ -108,6 +108,8 @@ local function BuildShowProgressBar(addonName, category, settings)
         GoldPlanner:ShowProgressBar(value);
     end);
     Settings.CreateCheckbox(category, showSetting, description);
+
+    return showSetting;
 end
 
 local function BuildLockProgressBar(addonName, category, settings)
@@ -127,6 +129,8 @@ local function BuildLockProgressBar(addonName, category, settings)
         GoldPlanner:SetProgressBarLocked(value);
     end);
     Settings.CreateCheckbox(category, lockSetting, description);
+
+    return lockSetting;
 end
 
 local function BuildProgressWidth(addonName, category, settings)
@@ -155,6 +159,8 @@ local function BuildProgressWidth(addonName, category, settings)
             settings.height
         )
     end);
+
+    return widthSetting;
 end
 
 local function BuildProgressHeight(addonName, category, settings)
@@ -183,6 +189,8 @@ local function BuildProgressHeight(addonName, category, settings)
             value
         );
     end);
+
+    return heightSetting;
 end
 
 local function BuildProgressFont(addonName, category, settings)
@@ -205,6 +213,8 @@ local function BuildShowStatsBox(addonName, category, settings)
         GoldPlanner:ShowStatsBox(value);
     end);
     Settings.CreateCheckbox(category, showSetting, description);
+
+    return showSetting;
 end
 
 local function BuildLockStatsBox(addonName, category, settings)
@@ -224,6 +234,8 @@ local function BuildLockStatsBox(addonName, category, settings)
         GoldPlanner:SetStatsBoxLocked(value);
     end);
     Settings.CreateCheckbox(category, lockSetting, description);
+
+    return lockSetting;
 end
 
 local function BuildStatsPadding(addonName, category, settings)
@@ -253,6 +265,8 @@ local function BuildStatsPadding(addonName, category, settings)
             value
         );
     end);
+
+    return paddingSetting;
 end
 
 local function CreateResetButton(parent, anchor, text, onClickCallback)
@@ -272,6 +286,9 @@ function GoldPlanner:BuildSettings()
 
     local addonName = GoldPlanner.name;
 
+    local showProgressBarSetting, lockProgressBarSetting, widthProgressBarSetting, heightProgressBarSetting;
+    local showStatsBoxSetting, lockStatsBoxSetting, paddingStatsBoxSetting;
+
     local panel = CreateFrame("Frame");
     local category = Settings.RegisterCanvasLayoutCategory(panel, self.STRINGS.ADDON_TITLE);
     Settings.RegisterAddOnCategory(category);
@@ -281,10 +298,21 @@ function GoldPlanner:BuildSettings()
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
         GoldPlanner:ResetProgressBar();
         GoldPlanner:ApplyProgressBarSettings();
+
+        local settings = GoldPlanner.db.settings.progressBar;
+        showProgressBarSetting:SetValue(settings.show);
+        lockProgressBarSetting:SetValue(settings.locked);
+        widthProgressBarSetting:SetValue(settings.width);
+        heightProgressBarSetting:SetValue(settings.height);
     end);
     local resetStatsBoxButton = CreateResetButton(panel, resetProgressBarButton, "Reset Stats Box", function()
         GoldPlanner:ResetStatsBoxSettings();
         GoldPlanner:ApplyStatsBoxSettings();
+
+        local settings = GoldPlanner.db.settings.statsBox;
+        showStatsBoxSetting:SetValue(settings.show);
+        lockStatsBoxSetting:SetValue(settings.locked);
+        paddingStatsBoxSetting:SetValue(settings.padding);
     end);
 
     panel:SetScript("OnShow", function(self)
@@ -298,18 +326,18 @@ function GoldPlanner:BuildSettings()
     Settings.RegisterAddOnCategory(progressBarCategory);
 
     local progressBarSettings = self.db.settings.progressBar;
-    BuildShowProgressBar(addonName, progressBarCategory, progressBarSettings);
-    BuildLockProgressBar(addonName, progressBarCategory, progressBarSettings);
-    BuildProgressWidth(addonName, progressBarCategory, progressBarSettings);
-    BuildProgressHeight(addonName, progressBarCategory, progressBarSettings);
+    showProgressBarSetting = BuildShowProgressBar(addonName, progressBarCategory, progressBarSettings);
+    lockProgressBarSetting = BuildLockProgressBar(addonName, progressBarCategory, progressBarSettings);
+    widthProgressBarSetting = BuildProgressWidth(addonName, progressBarCategory, progressBarSettings);
+    heightProgressBarSetting = BuildProgressHeight(addonName, progressBarCategory, progressBarSettings);
 
     local statsBoxCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Stats Box");
     Settings.RegisterAddOnCategory(statsBoxCategory);
 
     local statsBoxSettings = self.db.settings.statsBox;
-    BuildShowStatsBox(addonName, statsBoxCategory, statsBoxSettings);
-    BuildLockStatsBox(addonName, statsBoxCategory, statsBoxSettings);
-    BuildStatsPadding(addonName, statsBoxCategory, statsBoxSettings);
+    showStatsBoxSetting = BuildShowStatsBox(addonName, statsBoxCategory, statsBoxSettings);
+    lockStatsBoxSetting = BuildLockStatsBox(addonName, statsBoxCategory, statsBoxSettings);
+    paddingStatsBoxSetting = BuildStatsPadding(addonName, statsBoxCategory, statsBoxSettings);
 
     self.settingsCategory = category;
 end

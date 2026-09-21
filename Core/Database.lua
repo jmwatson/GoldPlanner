@@ -52,6 +52,14 @@ local function CopyDefaults(source, target)
     end
 end
 
+local function ResetTable(target, defaults)
+    for key in pairs(target) do
+        target[key] = nil;
+    end
+
+    CopyDefaults(defaults, target);
+end
+
 function GoldPlanner:InitializeDatabase()
     if not GoldPlannerDB then
         GoldPlannerDB = {};
@@ -67,9 +75,7 @@ function GoldPlanner:ResetProgressBar()
         self:InitializeDatabase();
     end
 
-    local defaults = {}
-    CopyDefaults(DEFAULT_DATABASE.settings.progressBar, defaults);
-    self.db.settings.progressBar = defaults;
+    ResetTable(self.db.settings.progressBar, DEFAULT_DATABASE.settings.progressBar);
 end
 
 function GoldPlanner:ResetStatsBoxSettings()
@@ -77,7 +83,5 @@ function GoldPlanner:ResetStatsBoxSettings()
         self:InitializeDatabase();
     end
 
-    local defaults = {};
-    CopyDefaults(DEFAULT_DATABASE.settings.statsBox, defaults);
-    self.db.settings.statsBox = defaults;
+    ResetTable(self.db.settings.statsBox, DEFAULT_DATABASE.settings.statsBox);
 end
