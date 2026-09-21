@@ -156,7 +156,7 @@ function GoldPlanner:GetTimeToAmount(currentCopper, targetCopper, rate)
     return copperDelta / rate;
 end
 
-function GoldPlanner:GetMoneyRateDisplay()
+function GoldPlanner:GetMoneyRateDisplay(trim)
     local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
 
     if not statistics then
@@ -165,7 +165,11 @@ function GoldPlanner:GetMoneyRateDisplay()
 
     local windowRate = statistics.rate * STATISTICS_WINDOW;
 
-    return GetMoneyString(windowRate, true);
+    if trim then
+        return GetMoneyString(trim(windowRate), true);
+    else
+        return GetMoneyString(windowRate, true);
+    end
 end
 
 function GoldPlanner:GetTimeToGoalDisplay()

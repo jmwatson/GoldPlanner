@@ -65,19 +65,21 @@ function GoldPlanner:UpdateProgressBar()
 
     local sformat = string.format;
     local frame = self.progressBar;
+    local bar = frame.progress.bar;
     local goal = self:GetGoal();
     local total = self:GetTotalCopper();
 
     if goal <= 0 then
-        frame.progress.bar:SetValue(0);
-        frame.progress.bar.text:SetText(self.STRINGS.EMPTY_STRING);
+        bar:SetValue(0);
+        bar.text:SetText(self.STRINGS.EMPTY_STRING);
+        stats.timeToGoal:SetText(sformat("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
     else
         local goalProgress = self:GetGoalProgress();
         local text = frame:GetWidth() >= 200 and
             sformat("%s / %s", GetMoneyString(trim(total), true), GetMoneyString(trim(goal), true)) or
             sformat("%.1f%%", goalProgress * 100);
-        frame.progress.bar:SetValue(goalProgress);
-        frame.progress.bar.text:SetText(text);
+        bar:SetValue(goalProgress);
+        bar.text:SetText(text);
     end
 end
 
