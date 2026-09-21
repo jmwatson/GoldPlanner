@@ -278,7 +278,11 @@ function GoldPlanner:BuildSettings()
 
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
-    local resetStatsBoxButton = CreateResetButton(panel, deadlineEditBox, "Reset Stats Box", function()
+    local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
+        GoldPlanner:ResetProgressBar();
+        GoldPlanner:ApplyProgressBarSettings();
+    end);
+    local resetStatsBoxButton = CreateResetButton(panel, resetProgressBarButton, "Reset Stats Box", function()
         GoldPlanner:ResetStatsBoxSettings();
         GoldPlanner:ApplyStatsBoxSettings();
     end);
