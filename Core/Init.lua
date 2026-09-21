@@ -113,20 +113,24 @@ local function HandleEvents(self, event, ...)
         GoldPlanner:BuildSettings();
         GoldPlanner:BuildDashboard();
         GoldPlanner:BuildProgressBar();
+        GoldPlanner:BuildStatsBox();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
         GoldPlanner:UpdateDashboard();
         GoldPlanner:UpdateProgressBar();
+        GoldPlanner:UpdateStatsBox();
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateDashboard();
         GoldPlanner:UpdateProgressBar();
+        GoldPlanner:UpdateStatsBox();
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
         GoldPlanner:UpdateDashboard();
         GoldPlanner:UpdateProgressBar();
+        GoldPlanner:UpdateStatsBox();
     end
 end
 

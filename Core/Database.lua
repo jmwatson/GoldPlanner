@@ -24,6 +24,16 @@ local DEFAULT_DATABASE = {
             locked = false,
             show = true,
         },
+        statsBox = {
+            point = "TOP",
+            x = 0,
+            y = -34,
+            padding = 3,
+            fillColor = { 0.8, 0.55, 0 },
+            borderColor = { 0, 0, 0, 1 },
+            locked = false,
+            show = true,
+        },
     },
 };
 
@@ -60,4 +70,14 @@ function GoldPlanner:ResetProgressBar()
     local defaults = {}
     CopyDefaults(DEFAULT_DATABASE.settings.progressBar, defaults);
     self.db.settings.progressBar = defaults;
+end
+
+function GoldPlanner:ResetStatsBoxSettings()
+    if not GoldPlannerDB then
+        self:InitializeDatabase();
+    end
+
+    local defaults = {};
+    CopyDefaults(DEFAULT_DATABASE.settings.statsBox, defaults);
+    self.db.settings.statsBox = defaults;
 end
