@@ -35,7 +35,7 @@ local function HandleBarCommand(value)
             return;
         end
  
-        GoldPlanner:SetProgressBarColor(r, g, b);
+        GoldPlanner:SetProgressBarColor({r, g, b});
         GoldPlanner:Log("Progress bar color updated.");
     elseif subcommand == "bordercolor" then
         local r, g, b = rest:match("^([%d.]+)%s+([%d.]+)%s+([%d.]+)$");
@@ -46,7 +46,7 @@ local function HandleBarCommand(value)
             return;
         end
  
-        GoldPlanner:SetProgressBarBorderColor(r, g, b);
+        GoldPlanner:SetProgressBarBorderColor({r, g, b});
         GoldPlanner:Log("Progress bar border color updated.");
     elseif subcommand == "reset" then
         GoldPlanner:ResetProgressBar();
