@@ -1,6 +1,10 @@
 local _, GoldPlanner = ...;
 
-local sformat = string.format;
+GoldPlanner.UI = GoldPlanner.UI or {};
+
+local WorldQuests = {};
+GoldPlanner.UI.WorldQuests = WorldQuests
+
 local ROW_HEIGHT = 18;
 
 local function CreateQuestRow(parent)
@@ -21,7 +25,7 @@ local function CreateQuestRow(parent)
     return row;
 end
 
-function GoldPlanner:BuildActivities(parent)
+function WorldQuests:Build(parent)
     if parent.activities then
         return;
     end
@@ -64,10 +68,10 @@ function GoldPlanner:BuildActivities(parent)
  
     parent.activities = activities;
  
-    self:UpdateActivitiesPanel();
+    self:UpdateActivities();
 end
 
-function GoldPlanner:UpdateActivitiesPanel()
+function WorldQuests:Update()
     local dashboard = self.dashboard;
  
     if not dashboard or not dashboard.activitiesPanel or not dashboard.activitiesPanel.content.activities then
@@ -108,7 +112,7 @@ function GoldPlanner:UpdateActivitiesPanel()
         local zoneName = mapInfo and mapInfo.name or "Unknown";
  
         row.gold:SetText(GetMoneyString(quest.gold, true));
-        row.title:SetText(sformat("%s (%s)", quest.title or "Unknown Quest", zoneName));
+        row.title:SetText(string.format("%s (%s)", quest.title or "Unknown Quest", zoneName));
         row:Show();
     end
  

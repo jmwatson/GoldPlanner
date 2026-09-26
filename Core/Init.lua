@@ -82,12 +82,12 @@ local function ReportWorldQuestTotal()
         GoldPlanner:Log("Total world quest gold available:", total);
     end
 
-    GoldPlanner:UpdateActivitiesPanel();
+    GoldPlanner.UI.WorldQuests:Update();
 end
 
 function GoldPlanner:RefreshWorldQuestGold()
     self:ScanAllWorldQuests();
-    self:UpdateActivitiesPanel();
+    GoldPlanner.UI.WorldQuests:Update();
 
     local pending = self:GetPendingRewardCount();
 
@@ -120,7 +120,7 @@ local function HandleSlashCommand(parameters)
         end
 
         GoldPlanner:SetGoal(gold * 10000);
-        GoldPlanner:UpdateDashboard();
+        GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
 
         GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
@@ -141,7 +141,7 @@ local function HandleSlashCommand(parameters)
 
         GoldPlanner:DebugMapQuests(mapID);
     else
-        GoldPlanner:ToggleDashboard();
+        GoldPlanner.UI.Dashboard:Toggle();
     end
 end
 
@@ -163,24 +163,24 @@ local function HandleEvents(self, event, ...)
         GoldPlanner:InitializeDatabase();
         GoldPlanner:CompactAllHistory();
         GoldPlanner:BuildSettings();
-        GoldPlanner:BuildDashboard();
+        GoldPlanner.UI.Dashboard:Build();
         GoldPlanner:BuildProgressBar();
         GoldPlanner:BuildStatsBox();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
-        GoldPlanner:UpdateDashboard();
+        GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
         GoldPlanner:UpdateStatsBox();
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
-        GoldPlanner:UpdateDashboard();
+        GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
         GoldPlanner:UpdateStatsBox();
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
-        GoldPlanner:UpdateDashboard();
+        GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
         GoldPlanner:UpdateStatsBox();
     elseif event == EVENTS.QUEST_DATA_LOAD_RESULT then
