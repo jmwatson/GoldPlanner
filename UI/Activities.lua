@@ -38,8 +38,7 @@ function GoldPlanner:BuildActivities(parent)
     refreshButton:SetText("Refresh");
     refreshButton:SetPoint("TOPRIGHT", 0, 4);
     refreshButton:SetScript("OnClick", function()
-        GoldPlanner:ScanAllWorldQuests();
-        GoldPlanner:UpdateActivitiesPanel();
+        GoldPlanner:RefreshWorldQuestGold();
     end);
  
     local totalText = activities:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
@@ -71,11 +70,11 @@ end
 function GoldPlanner:UpdateActivitiesPanel()
     local dashboard = self.dashboard;
  
-    if not dashboard or not dashboard.activitiesPanel or not dashboard.activitiesPanel.activities then
+    if not dashboard or not dashboard.activitiesPanel or not dashboard.activitiesPanel.content.activities then
         return;
     end
  
-    local activities = dashboard.activitiesPanel.activities;
+    local activities = dashboard.activitiesPanel.content.activities;
     local scrollChild = activities.scrollChild;
     local rows = activities.rows;
  

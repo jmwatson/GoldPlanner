@@ -143,7 +143,7 @@ function GoldPlanner:BuildDashboard()
 
         if not GoldPlanner.Runtime.HasScannedWorldQuests then
             GoldPlanner.Runtime.HasScannedWorldQuests = true;
-            GoldPlanner:ScanAllWorldQuests();
+            GoldPlanner:RefreshWorldQuestGold();
         end
     end);
 
