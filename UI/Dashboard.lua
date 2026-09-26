@@ -49,7 +49,7 @@ function Dashboard:Build()
 
     local title = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     title:SetPoint("TOP", 0, -5);
-    title:SetText(self.STRINGS.ADDON_TITLE);
+    title:SetText(GoldPlanner.STRINGS.ADDON_TITLE);
 
     local navMenu = GoldPlanner:CreateNavMenu(dashboard, NAV_WIDTH);
     navMenu:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 4, -30);
@@ -72,8 +72,8 @@ function Dashboard:Build()
         end
     end);
 
-    GoldPlanner:BuildOverview(overviewPanel.content);
-    GoldPlanner:BuildActivities(worldQuestPanel.content);
+    GoldPlanner.UI.Overview:Build(overviewPanel.content);
+    GoldPlanner.UI.WorldQuests:Build(worldQuestPanel.content);
 
     dashboard.navMenu = navMenu;
     dashboard.overviewPanel = overviewPanel;
@@ -81,14 +81,14 @@ function Dashboard:Build()
 
     self.dashboard = dashboard;
 
-    GoldPlanner.UI.Overview:UpdateOverview();
+    GoldPlanner.UI.Overview:Update();
 end
 
 function Dashboard:Toggle()
     if self.dashboard:IsShown() then
         self.dashboard:Hide();
     else
-        GoldPlanner.UI.Overview:UpdateOverview();
+        GoldPlanner.UI.Overview:Update();
         self.dashboard:Show();
     end
 end

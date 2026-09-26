@@ -6,6 +6,10 @@ local Overview = {};
 GoldPlanner.UI.Overview = Overview;
 
 function Overview:Build(parent)
+    if self.built then
+        return;
+    end
+
     local goldText = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     goldText:SetPoint("TOPLEFT", 20, -40);
     goldText:SetText("Gold");
@@ -72,54 +76,57 @@ function Overview:Build(parent)
     local dailyGoal = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     dailyGoal:SetPoint("TOPLEFT", 20, -280);
 
-    parent.characterGold = characterGold;
-    parent.warbandGold = warbandGold;
-    parent.totalGold = totalGold;
-    parent.goal = goal;
-    parent.remaining = remaining;
-    parent.progress = progress;
-    parent.rate = rate;
-    parent.timeToGoal = timeToGoal;
-    parent.dailyGoal = dailyGoal;
+    self.characterGold = characterGold;
+    self.warbandGold = warbandGold;
+    self.totalGold = totalGold;
+    self.goal = goal;
+    self.remaining = remaining;
+    self.progress = progress;
+    self.rate = rate;
+    self.timeToGoal = timeToGoal;
+    self.dailyGoal = dailyGoal;
+
+    self.built = true;
 end
 
 function Overview:Update()
-    if not self.dashboard then
+    if not self.built then
         return;
     end
 
-    local dashboard = self.dashboard.overviewPanel.content;
-    dashboard.characterGold:SetText("Character: " .. GetMoneyString(self:GetCharacter().copper, true));
-    dashboard.warbandGold:SetText("Warband: " .. GetMoneyString(self:GetWarband().copper, true));
-    dashboard.totalGold:SetText("Total: " .. GetMoneyString(self:GetTotalCopper(), true));
+    local GP = GoldPlanner;
 
-    local goal = self:GetGoal();
+    self.characterGold:SetText("Character: " .. GetMoneyString(GP:GetCharacter().copper, true));
+    self.warbandGold:SetText("Warband: " .. GetMoneyString(GP:GetWarband().copper, true));
+    self.totalGold:SetText("Total: " .. GetMoneyString(GP:GetTotalCopper(), true));
+
+    local goal = GP:GetGoal();
 
     if goal <= 0 then
-        dashboard.goal:SetText(self.STRINGS.GOAL .. ": " .. self.STRINGS.NO_GOAL);
-        dashboard.remaining:SetText(self.STRINGS.EMPTY_STRING);
-        dashboard.progress.bar:SetValue(0);
-        dashboard.progress.bar.text:SetText(self.STRINGS.EMPTY_STRING);
-        dashboard.timeToGoal:SetText(string.format("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.NO_GOAL));
+        self.goal:SetText(GP.STRINGS.GOAL .. ": " .. GP.STRINGS.NO_GOAL);
+        self.remaining:SetText(GP.STRINGS.EMPTY_STRING);
+        self.progress.bar:SetValue(0);
+        self.progress.bar.text:SetText(GP.STRINGS.EMPTY_STRING);
+        self.timeToGoal:SetText(string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
     else
-        local timeToGoal = self:GetTimeToGoalDisplay();
-        local goalProgress = self:GetGoalProgress();
-        dashboard.goal:SetText(string.format("%s: %s", self.STRINGS.GOAL, GetMoneyString(goal, true)));
-        dashboard.remaining:SetText(string.format("%s: %s", self.STRINGS.REMAINING, GetMoneyString(self:GetGoalRemaining(), true)));
-        dashboard.progress.bar:SetValue(goalProgress);
-        dashboard.progress.bar.text:SetText(string.format("%.1f%%", goalProgress * 100));
-        dashboard.timeToGoal:SetText(timeToGoal and
-            string.format("%s: %s", self.STRINGS.TIME_TO_GOAL, timeToGoal) or
-            string.format("%s: %s", self.STRINGS.TIME_TO_GOAL, self.STRINGS.UNAVAILABLE));
+        local timeToGoal = GP:GetTimeToGoalDisplay();
+        local goalProgress = GP:GetGoalProgress();
+        self.goal:SetText(string.format("%s: %s", GP.STRINGS.GOAL, GetMoneyString(goal, true)));
+        self.remaining:SetText(string.format("%s: %s", GP.STRINGS.REMAINING, GetMoneyString(GP:GetGoalRemaining(), true)));
+        self.progress.bar:SetValue(goalProgress);
+        self.progress.bar.text:SetText(string.format("%.1f%%", goalProgress * 100));
+        self.timeToGoal:SetText(timeToGoal and
+            string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, timeToGoal) or
+            string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
     end
 
-    local rateDisplay = self:GetMoneyRateDisplay();
-    dashboard.rate:SetText(rateDisplay and
-        string.format("%s: %s/hour", self.STRINGS.RATE, rateDisplay) or
-        string.format("%s: %s", self.STRINGS.RATE, self.STRINGS.NOT_ENOUGH_DATA));
+    local rateDisplay = GP:GetMoneyRateDisplay();
+    self.rate:SetText(rateDisplay and
+        string.format("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
+        string.format("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
 
-    local dailyGoalDisplay = self:GetDailyGoalDisplay();
-    dashboard.dailyGoal:SetText(dailyGoalDisplay and
-        string.format("%s: %s", self.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
-        string.format("%s: %s", self.STRINGS.DAILY_GOAL, self.STRINGS.NO_DEADLINE));
+    local dailyGoalDisplay = GP:GetDailyGoalDisplay();
+    self.dailyGoal:SetText(dailyGoalDisplay and
+        string.format("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
+        string.format("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
 end
