@@ -28,7 +28,7 @@ function Dashboard:Build()
         return;
     end
 
-    local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent, "BasicFrameTemplateWithInset");
+    local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent, "BasicFrameTemplate");
     tinsert(UISpecialFrames, "GoldPlannerDashboard");
 
     dashboard:SetSize(500, 500);
