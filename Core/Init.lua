@@ -114,7 +114,18 @@ local function HandleSlashCommand(parameters)
         GoldPlanner:PrintMapChain();
     elseif command == "wq" then
         GoldPlanner:ScanAllWorldQuests();
-        GoldPlanner:Log("Total world quest gold available:", GetMoneyString(GoldPlanner:GetTotalWorldQuestGold(), true));
+        GoldPlanner:UpdateActivitiesPanel();
+
+        local pending = GoldPlanner:GetPendingRewardCount();
+
+        if pending > 0 then
+            GoldPlanner:Log("Scan complete, waiting on reward data for", pending, "quests...");
+            wqReportPending = true;
+            C_Timer.After(5, ReportWorldQuestTotal);
+        else
+            wqReportPending = true;
+            ReportWorldQuestTotal();
+        end
     elseif command == "wqdebug" then
         local mapID = tonumber(value);
 

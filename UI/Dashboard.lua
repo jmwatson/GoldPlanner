@@ -2,6 +2,13 @@ local _, GoldPlanner = ...;
 
 local sformat = string.format;
 
+local function CreateDashboardTab(parent, text)
+    local tab = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate");
+    tab:SetSize(90, 22);
+    tab:SetText(text);
+    return tab;
+end
+
 function GoldPlanner:BuildDashboard()
     if self.dashboard then
         return;
@@ -30,32 +37,73 @@ function GoldPlanner:BuildDashboard()
     title:SetPoint("TOP", 0, -5);
     title:SetText(self.STRINGS.ADDON_TITLE);
 
-    local goldText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    local overviewTab = CreateDashboardTab(dashboard, "Overview");
+    overviewTab:SetPoint("TOPLEFT", 15, -20);
+
+    local activitiesTab = CreateDashboardTab(dashboard, "Activities");
+    activitiesTab:SetPoint("LEFT", overviewTab, "RIGHT", 4, 0);
+
+    local overviewPanel = CreateFrame("Frame", nil, dashboard);
+    overviewPanel:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 0, -58);
+    overviewPanel:SetPoint("BOTTOMRIGHT", dashboard, "BOTTOMRIGHT", 0, 5);
+
+    local activitiesPanel = CreateFrame("Frame", nil, dashboard);
+    activitiesPanel:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 0, -58);
+    activitiesPanel:SetPoint("BOTTOMRIGHT", dashboard, "BOTTOMRIGHT", 0, 5);
+    activitiesPanel:Hide();
+
+    local function SelectTab(tabName)
+        if tabName == "activities" then
+            overviewPanel:Hide();
+            overviewTab:Enable();
+            activitiesPanel:Show();
+            activitiesTab:Disable();
+
+            GoldPlanner:UpdateActivitiesPanel();
+
+            if not GoldPlanner.Runtime.HasScannedWorldQuests then
+                GoldPlanner.Runtime.HasScannedWorldQuests = true;
+                GoldPlanner:ScanAllWorldQuests();
+            end
+        else
+            activitiesPanel:Hide();
+            activitiesTab:Enable();
+            overviewPanel:Show();
+            overviewTab:Disable();
+        end
+    end
+
+    overviewTab:SetScript("OnClick", function() SelectTab("overview") end);
+    activitiesTab:SetScript("OnClick", function() SelectTab("activities") end);
+
+    overviewTab:Disable();
+
+    local goldText = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     goldText:SetPoint("TOPLEFT", 20, -40);
     goldText:SetText("Gold");
 
-    local characterGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local characterGold = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     characterGold:SetPoint("TOPLEFT", 20, -60);
 
-    local warbandGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local warbandGold = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     warbandGold:SetPoint("TOPLEFT", 20, -80);
 
-    local totalGold = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local totalGold = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     totalGold:SetPoint("TOPLEFT", 20, -100);
 
-    local goalText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    local goalText = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     goalText:SetPoint("TOPLEFT", 20, -130);
     goalText:SetText("Goal");
 
-    local goal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local goal = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     goal:SetPoint("TOPLEFT", 20, -150);
 
-    local remaining = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local remaining = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     remaining:SetPoint("TOPLEFT", 20, -170);
 
     local progressInset = 3;
     local barInset = 5;
-    local progress = CreateFrame("StatusBar", nil, dashboard, "BackdropTemplate");
+    local progress = CreateFrame("StatusBar", nil, overviewPanel, "BackdropTemplate");
     progress:SetPoint("TOPLEFT", 20, -190);
     progress:SetSize(300, 25);
     progress:SetBackdrop({
@@ -83,20 +131,25 @@ function GoldPlanner:BuildDashboard()
     progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     progress.bar.text:SetPoint("CENTER");
 
-    local statsText = dashboard:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    local statsText = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     statsText:SetPoint("TOPLEFT", 20, -220);
     statsText:SetText("Statistics");
 
-    local rate = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local rate = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     rate:SetPoint("TOPLEFT", 20, -240);
 
-    local timeToGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local timeToGoal = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     timeToGoal:SetPoint("TOPLEFT", 20, -260);
 
-    local dailyGoal = dashboard:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    local dailyGoal = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
     dailyGoal:SetPoint("TOPLEFT", 20, -280);
 
-    GoldPlanner:BuildActivities(dashboard, dailyGoal);
+    GoldPlanner:BuildActivities(activitiesPanel);
+
+    dashboard.overviewPanel = overviewPanel;
+    dashboard.overviewTab = overviewTab;
+    dashboard.activitiesPanel = activitiesPanel;
+    dashboard.activitiesTab = activitiesTab;
 
     dashboard.characterGold = characterGold;
     dashboard.warbandGold = warbandGold;
