@@ -62,6 +62,20 @@ local function HandleBarCommand(value)
 end
 
 local wqReportPending = false;
+local wqUpdateScheduled = false;
+
+local function ScheduleWorldQuestPanelUpdate()
+    if wqUpdateScheduled then
+        return;
+    end
+
+    wqUpdateScheduled = true;
+
+    C_Timer.After(0, function()
+        wqUpdateScheduled = false;
+        GoldPlanner.UI.WorldQuests:Update();
+    end);
+end
 
 local function ReportWorldQuestTotal()
     if not wqReportPending then
@@ -188,7 +202,9 @@ local function HandleEvents(self, event, ...)
         if success and GoldPlanner.Runtime.PendingRewardData[questID] then
             GoldPlanner.Runtime.PendingRewardData[questID] = nil;
             GoldPlanner:HandleWorldQuestRewardData(questID);
-            
+
+            ScheduleWorldQuestPanelUpdate();
+
             if GoldPlanner:GetPendingRewardCount() == 0 then
                 ReportWorldQuestTotal();
             end
