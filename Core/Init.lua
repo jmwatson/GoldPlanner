@@ -61,6 +61,28 @@ local function HandleBarCommand(value)
     end
 end
 
+local wqReportPending = false;
+
+local function ReportWorldQuestTotal()
+    if not wqReportPending then
+        return;
+    end
+
+    wqReportPending = false;
+
+    local pending = GoldPlanner:GetPendingRewardCount();
+    local total = GetMoneyString(GoldPlanner:GetTotalWorldQuestGold(), true);
+
+    if pending > 0 then
+        GoldPlanner:Log(
+            "Total world quest gold available:", total,
+            "(still waiting on reward data for", pending, "quests)"
+        );
+    else
+        GoldPlanner:Log("Total world quest gold available:", total);
+    end
+end
+
 local function HandleSlashCommand(parameters)
     local command, value = parameters:match("^(%S+)%s*(.*)$");
     local usage = "Usage: /gp goal <gold amount> [days]";
@@ -88,6 +110,19 @@ local function HandleSlashCommand(parameters)
         HandleBarCommand(value);
     elseif command == "settings" then
         Settings.OpenToCategory(GoldPlanner.settingsCategory:GetID());
+    elseif command == "maps" then
+        GoldPlanner:PrintMapChain();
+    elseif command == "wq" then
+        GoldPlanner:ScanAllWorldQuests();
+        GoldPlanner:Log("Total world quest gold available:", GetMoneyString(GoldPlanner:GetTotalWorldQuestGold(), true));
+    elseif command == "wqdebug" then
+        local mapID = tonumber(value);
+
+        if not mapID then
+            mapID = C_Map.GetBestMapForUnit("player");
+        end
+
+        GoldPlanner:DebugMapQuests(mapID);
     else
         GoldPlanner:ToggleDashboard();
     end
@@ -121,25 +156,6 @@ local function HandleEvents(self, event, ...)
         GoldPlanner:UpdateDashboard();
         GoldPlanner:UpdateProgressBar();
         GoldPlanner:UpdateStatsBox();
-
-        local mapID = C_Map.GetBestMapForUnit("player");
-
-        if mapID then
-            local quests = GoldPlanner:ScanWorldQuests(mapID);
-
-            GoldPlanner:Log("Found", #quests, "World Quests.");
-
-            for _, quest in ipairs(quests) do
-                GoldPlanner:Log(
-                    quest.questID,
-                    quest.title,
-                    quest.mapID,
-                    quest.x,
-                    quest.y,
-                    quest.timeLeft
-                );
-            end
-        end
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateDashboard();
@@ -152,10 +168,13 @@ local function HandleEvents(self, event, ...)
         GoldPlanner:UpdateStatsBox();
     elseif event == EVENTS.QUEST_DATA_LOAD_RESULT then
         local questID, success = ...;
-        -- GoldPlanner:Log(EVENTS.QUEST_DATA_LOAD_RESULT, questID, success);
-        if success and GoldPlanner.PendingRewardData[questID] then
-            GoldPlanner.PendingRewardData[questID] = nil;
+        if success and GoldPlanner.Runtime.PendingRewardData[questID] then
+            GoldPlanner.Runtime.PendingRewardData[questID] = nil;
             GoldPlanner:HandleWorldQuestRewardData(questID);
+            
+            if GoldPlanner:GetPendingRewardCount() == 0 then
+                ReportWorldQuestTotal();
+            end
         end
     end
 end

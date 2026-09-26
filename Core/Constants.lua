@@ -41,3 +41,7 @@ GoldPlanner.STRINGS = {
     UNAVAILABLE = "Unavailable",
     REACHED = "Reached",
 };
+
+GoldPlanner.EXPANSION_CONTINENTS = {
+    [1] = 2537,
+};
