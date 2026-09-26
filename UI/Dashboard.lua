@@ -2,12 +2,101 @@ local _, GoldPlanner = ...;
 
 local sformat = string.format;
 
-local function CreateDashboardTab(parent, text)
-    local tab = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate");
-    tab:SetSize(90, 22);
-    tab:SetText(text);
-    return tab;
+local PANEL_PADDING = 16;
+local NAV_WIDTH = 110;
+
+local function BuildOverview(parent)
+    local goldText = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    goldText:SetPoint("TOPLEFT", 20, -40);
+    goldText:SetText("Gold");
+
+    local characterGold = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    characterGold:SetPoint("TOPLEFT", 20, -60);
+
+    local warbandGold = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    warbandGold:SetPoint("TOPLEFT", 20, -80);
+
+    local totalGold = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    totalGold:SetPoint("TOPLEFT", 20, -100);
+
+    local goalText = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    goalText:SetPoint("TOPLEFT", 20, -130);
+    goalText:SetText("Goal");
+
+    local goal = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    goal:SetPoint("TOPLEFT", 20, -150);
+
+    local remaining = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    remaining:SetPoint("TOPLEFT", 20, -170);
+
+    local progressInset = 3;
+    local barInset = 5;
+    local progress = CreateFrame("StatusBar", nil, parent, "BackdropTemplate");
+    progress:SetPoint("TOPLEFT", 20, -190);
+    progress:SetSize(300, 25);
+    progress:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 12,
+        insets = {
+            left = progressInset,
+            right = progressInset,
+            top = progressInset,
+            bottom = progressInset,
+        },
+    });
+    progress.bar = CreateFrame("StatusBar", nil, progress);
+    progress.bar:SetPoint("TOPLEFT", barInset, -barInset);
+    progress.bar:SetPoint("BOTTOMRIGHT", -barInset, barInset);
+    progress.bar:SetMinMaxValues(0, 1);
+
+    local progressTexture = progress.bar:CreateTexture(nil, "ARTWORK");
+    progressTexture:SetColorTexture(0.8, 0.55, 0);
+    progress.bar:SetStatusBarTexture(progressTexture);
+
+    progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    progress.bar.text:SetPoint("CENTER");
+
+    local statsText = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
+    statsText:SetPoint("TOPLEFT", 20, -220);
+    statsText:SetText("Statistics");
+
+    local rate = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    rate:SetPoint("TOPLEFT", 20, -240);
+
+    local timeToGoal = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    timeToGoal:SetPoint("TOPLEFT", 20, -260);
+
+    local dailyGoal = parent:CreateFontString(nil, "OVERLAY", "GameFontWhite");
+    dailyGoal:SetPoint("TOPLEFT", 20, -280);
+
+    parent.characterGold = characterGold;
+    parent.warbandGold = warbandGold;
+    parent.totalGold = totalGold;
+    parent.goal = goal;
+    parent.remaining = remaining;
+    parent.progress = progress;
+    parent.rate = rate;
+    parent.timeToGoal = timeToGoal;
+    parent.dailyGoal = dailyGoal;
 end
+
+function GoldPlanner:CreatePanel(parent)
+    local panel = CreateFrame("Frame", nil, parent);
+    panel:SetAllPoints(parent);
+    panel:Hide();
+
+    local content = CreateFrame("Frame", nil, panel);
+    content:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_PADDING);
+    content:SetPoint("BOTTOMRIGHT", -PANEL_PADDING, PANEL_PADDING);
+
+    panel.content = content;
+
+    return panel;
+end
+
 
 function GoldPlanner:BuildDashboard()
     if self.dashboard then
@@ -37,129 +126,33 @@ function GoldPlanner:BuildDashboard()
     title:SetPoint("TOP", 0, -5);
     title:SetText(self.STRINGS.ADDON_TITLE);
 
-    local overviewTab = CreateDashboardTab(dashboard, "Overview");
-    overviewTab:SetPoint("TOPLEFT", 15, -20);
+    local navMenu = GoldPlanner:CreateNavMenu(dashboard, NAV_WIDTH);
+    navMenu:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 4, -30);
+    navMenu:SetPoint("BOTTOMLEFT", dashboard, "BOTTOMLEFT", 4, 4);
 
-    local activitiesTab = CreateDashboardTab(dashboard, "Activities");
-    activitiesTab:SetPoint("LEFT", overviewTab, "RIGHT", 4, 0);
+    local contentArea = CreateFrame("Frame", nil, dashboard);
+    contentArea:SetPoint("TOPLEFT", navMenu, "TOPRIGHT", 0, 0);
+    contentArea:SetPoint("BOTTOMRIGHT", dashboard, "BOTTOMRIGHT", -4, 4);
 
-    local overviewPanel = CreateFrame("Frame", nil, dashboard);
-    overviewPanel:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 0, -58);
-    overviewPanel:SetPoint("BOTTOMRIGHT", dashboard, "BOTTOMRIGHT", 0, 5);
+    local overviewPanel = GoldPlanner:CreatePanel(contentArea);
+    local activitiesPanel = GoldPlanner:CreatePanel(contentArea);
 
-    local activitiesPanel = CreateFrame("Frame", nil, dashboard);
-    activitiesPanel:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 0, -58);
-    activitiesPanel:SetPoint("BOTTOMRIGHT", dashboard, "BOTTOMRIGHT", 0, 5);
-    activitiesPanel:Hide();
+    navMenu:AddItem("Overview", overviewPanel);
+    navMenu:AddItem("Activities", activitiesPanel, function()
+        GoldPlanner:UpdateActivitiesPanel();
 
-    local function SelectTab(tabName)
-        if tabName == "activities" then
-            overviewPanel:Hide();
-            overviewTab:Enable();
-            activitiesPanel:Show();
-            activitiesTab:Disable();
-
-            GoldPlanner:UpdateActivitiesPanel();
-
-            if not GoldPlanner.Runtime.HasScannedWorldQuests then
-                GoldPlanner.Runtime.HasScannedWorldQuests = true;
-                GoldPlanner:ScanAllWorldQuests();
-            end
-        else
-            activitiesPanel:Hide();
-            activitiesTab:Enable();
-            overviewPanel:Show();
-            overviewTab:Disable();
+        if not GoldPlanner.Runtime.HasScannedWorldQuests then
+            GoldPlanner.Runtime.HasScannedWorldQuests = true;
+            GoldPlanner:ScanAllWorldQuests();
         end
-    end
+    end);
 
-    overviewTab:SetScript("OnClick", function() SelectTab("overview") end);
-    activitiesTab:SetScript("OnClick", function() SelectTab("activities") end);
+    BuildOverview(overviewPanel.content);
+    GoldPlanner:BuildActivities(activitiesPanel.content);
 
-    overviewTab:Disable();
-
-    local goldText = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
-    goldText:SetPoint("TOPLEFT", 20, -40);
-    goldText:SetText("Gold");
-
-    local characterGold = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    characterGold:SetPoint("TOPLEFT", 20, -60);
-
-    local warbandGold = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    warbandGold:SetPoint("TOPLEFT", 20, -80);
-
-    local totalGold = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    totalGold:SetPoint("TOPLEFT", 20, -100);
-
-    local goalText = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
-    goalText:SetPoint("TOPLEFT", 20, -130);
-    goalText:SetText("Goal");
-
-    local goal = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    goal:SetPoint("TOPLEFT", 20, -150);
-
-    local remaining = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    remaining:SetPoint("TOPLEFT", 20, -170);
-
-    local progressInset = 3;
-    local barInset = 5;
-    local progress = CreateFrame("StatusBar", nil, overviewPanel, "BackdropTemplate");
-    progress:SetPoint("TOPLEFT", 20, -190);
-    progress:SetSize(300, 25);
-    progress:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = true,
-        tileSize = 16,
-        edgeSize = 12,
-        insets = {
-            left = progressInset,
-            right = progressInset,
-            top = progressInset,
-            bottom = progressInset,
-        },
-    });
-    progress.bar = CreateFrame("StatusBar", nil, progress);
-    progress.bar:SetPoint("TOPLEFT", barInset, -barInset);
-    progress.bar:SetPoint("BOTTOMRIGHT", -barInset, barInset);
-    progress.bar:SetMinMaxValues(0, 1);
-
-    local progressTexture = progress.bar:CreateTexture(nil, "ARTWORK");
-    progressTexture:SetColorTexture(0.8, 0.55, 0);
-    progress.bar:SetStatusBarTexture(progressTexture);
-
-    progress.bar.text = progress.bar:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    progress.bar.text:SetPoint("CENTER");
-
-    local statsText = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
-    statsText:SetPoint("TOPLEFT", 20, -220);
-    statsText:SetText("Statistics");
-
-    local rate = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    rate:SetPoint("TOPLEFT", 20, -240);
-
-    local timeToGoal = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    timeToGoal:SetPoint("TOPLEFT", 20, -260);
-
-    local dailyGoal = overviewPanel:CreateFontString(nil, "OVERLAY", "GameFontWhite");
-    dailyGoal:SetPoint("TOPLEFT", 20, -280);
-
-    GoldPlanner:BuildActivities(activitiesPanel);
-
+    dashboard.navMenu = navMenu;
     dashboard.overviewPanel = overviewPanel;
-    dashboard.overviewTab = overviewTab;
     dashboard.activitiesPanel = activitiesPanel;
-    dashboard.activitiesTab = activitiesTab;
-
-    dashboard.characterGold = characterGold;
-    dashboard.warbandGold = warbandGold;
-    dashboard.totalGold = totalGold;
-    dashboard.goal = goal;
-    dashboard.remaining = remaining;
-    dashboard.progress = progress;
-    dashboard.rate = rate;
-    dashboard.timeToGoal = timeToGoal;
-    dashboard.dailyGoal = dailyGoal;
 
     self.dashboard = dashboard;
 
@@ -171,7 +164,7 @@ function GoldPlanner:UpdateDashboard()
         return;
     end
 
-    local dashboard = self.dashboard;
+    local dashboard = self.dashboard.overviewPanel.content;
     dashboard.characterGold:SetText("Character: " .. GetMoneyString(self:GetCharacter().copper, true));
     dashboard.warbandGold:SetText("Warband: " .. GetMoneyString(self:GetWarband().copper, true));
     dashboard.totalGold:SetText("Total: " .. GetMoneyString(self:GetTotalCopper(), true));

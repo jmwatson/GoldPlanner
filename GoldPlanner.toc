@@ -20,6 +20,7 @@ Activities/Activities.lua
 Activities/WorldQuests.lua
 
 UI/Settings.lua
+UI/NavMenu.lua
 UI/Activities.lua
 UI/Dashboard.lua
 UI/ProgressBar.lua
