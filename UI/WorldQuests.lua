@@ -8,12 +8,16 @@ GoldPlanner.UI.WorldQuests = WorldQuests
 local ROW_HEIGHT = 18;
 
 local function CreateQuestRow(parent)
-    local row = CreateFrame("Frame", nil, parent);
+    local row = CreateFrame("Button", nil, parent);
     row:SetHeight(ROW_HEIGHT);
+
+    local highlight = row:CreateTexture(nil, "HIGHLIGHT");
+    highlight:SetAllPoints();
+    highlight:SetColorTexture(1, 1, 1, 0.08);
 
     row.gold = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
     row.gold:SetPoint("LEFT", 0, 0);
-    row.gold:SetWidth(80);
+    row.gold:SetWidth(100);
     row.gold:SetJustifyH("LEFT");
 
     row.title = row:CreateFontString(nil, "OVERLAY", "GameFontWhiteSmall");
@@ -21,6 +25,22 @@ local function CreateQuestRow(parent)
     row.title:SetPoint("RIGHT", row, "RIGHT", 0, 0);
     row.title:SetJustifyH("LEFT");
     row.title:SetWordWrap(false);
+
+    row:SetScript("OnClick", function(self)
+        if self.questID then
+            GoldPlanner:TrackWorldQuest(self.questID);
+        end
+    end);
+
+    row:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP");
+        GameTooltip:SetText("Click to track");
+        GameTooltip:Show();
+    end);
+
+    row:SetScript("OnLeave", function(self)
+        GameTooltip:Hide();
+    end);
 
     return row;
 end
@@ -106,6 +126,7 @@ function WorldQuests:Update()
 
         row.gold:SetText(GetMoneyString(quest.gold, true));
         row.title:SetText(string.format("%s (%s)", quest.title or "Unknown Quest", zoneName));
+        row.questID = quest.questID;
         row:Show();
     end
 

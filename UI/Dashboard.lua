@@ -63,7 +63,7 @@ function Dashboard:Build()
     local worldQuestPanel = CreatePanel(contentArea);
 
     navMenu:AddItem("Overview", overviewPanel);
-    navMenu:AddItem("Activities", worldQuestPanel, function()
+    navMenu:AddItem("World Quests", worldQuestPanel, function()
         GoldPlanner.UI.WorldQuests:Update();
 
         if not GoldPlanner.Runtime.HasScannedWorldQuests then
