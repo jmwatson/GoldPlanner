@@ -107,7 +107,7 @@ local function HandleSlashCommand(parameters)
     elseif command == "bar" then
         HandleBarCommand(value);
     elseif command == "settings" then
-        Settings.OpenToCategory(GoldPlanner.settingsCategory:GetID());
+        Settings.OpenToCategory(GoldPlanner.UI.Settings.category:GetID());
     elseif command == "maps" then
         GoldPlanner:PrintMapChain();
     elseif command == "wq" then
@@ -142,7 +142,7 @@ local function HandleEvents(self, event, ...)
 
         GoldPlanner:InitializeDatabase();
         GoldPlanner:CompactAllHistory();
-        GoldPlanner:BuildSettings();
+        GoldPlanner.UI.Settings:Build();
         GoldPlanner.UI.Dashboard:Build();
         GoldPlanner.UI.ProgressBar:Build();
         GoldPlanner.UI.StatsBox:Build();

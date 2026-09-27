@@ -1,5 +1,10 @@
 local _, GoldPlanner = ...;
 
+GoldPlanner.UI = GoldPlanner.UI or {};
+
+local _Settings = {};
+GoldPlanner.UI.Settings = _Settings;
+
 local fontOptions = {
     "GameFontNormalHuge",
     "GameFontNormalLarge",
@@ -279,8 +284,8 @@ local function CreateResetButton(parent, anchor, text, onClickCallback)
         return button;
 end
 
-function GoldPlanner:BuildSettings()
-    if self.settingsCategory then
+function _Settings:Build()
+    if self.category then
         return;
     end
 
@@ -290,13 +295,13 @@ function GoldPlanner:BuildSettings()
     local showStatsBoxSetting, lockStatsBoxSetting, paddingStatsBoxSetting;
 
     local panel = CreateFrame("Frame");
-    local category = Settings.RegisterCanvasLayoutCategory(panel, self.STRINGS.ADDON_TITLE);
+    local category = Settings.RegisterCanvasLayoutCategory(panel, GoldPlanner.STRINGS.ADDON_TITLE);
     Settings.RegisterAddOnCategory(category);
 
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
-        GoldPlanner.UI.ProgressBar:Reset();
+        GoldPlanner:ResetProgressBar();
         GoldPlanner.UI.ProgressBar:ApplySettings();
 
         local settings = GoldPlanner.db.settings.progressBar;
@@ -325,7 +330,7 @@ function GoldPlanner:BuildSettings()
     local progressBarCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Progress Bar");
     Settings.RegisterAddOnCategory(progressBarCategory);
 
-    local progressBarSettings = self.db.settings.progressBar;
+    local progressBarSettings = GoldPlanner.db.settings.progressBar;
     showProgressBarSetting = BuildShowProgressBar(addonName, progressBarCategory, progressBarSettings);
     lockProgressBarSetting = BuildLockProgressBar(addonName, progressBarCategory, progressBarSettings);
     widthProgressBarSetting = BuildProgressWidth(addonName, progressBarCategory, progressBarSettings);
@@ -334,10 +339,10 @@ function GoldPlanner:BuildSettings()
     local statsBoxCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Stats Box");
     Settings.RegisterAddOnCategory(statsBoxCategory);
 
-    local statsBoxSettings = self.db.settings.statsBox;
+    local statsBoxSettings = GoldPlanner.db.settings.statsBox;
     showStatsBoxSetting = BuildShowStatsBox(addonName, statsBoxCategory, statsBoxSettings);
     lockStatsBoxSetting = BuildLockStatsBox(addonName, statsBoxCategory, statsBoxSettings);
     paddingStatsBoxSetting = BuildStatsPadding(addonName, statsBoxCategory, statsBoxSettings);
 
-    self.settingsCategory = category;
+    self.category = category;
 end
