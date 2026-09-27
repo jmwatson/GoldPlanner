@@ -61,7 +61,6 @@ local function HandleBarCommand(value)
     end
 end
 
-local wqReportPending = false;
 local wqUpdateScheduled = false;
 
 local function ScheduleWorldQuestPanelUpdate()
@@ -77,42 +76,9 @@ local function ScheduleWorldQuestPanelUpdate()
     end);
 end
 
-local function ReportWorldQuestTotal()
-    if not wqReportPending then
-        return;
-    end
-
-    wqReportPending = false;
-
-    local pending = GoldPlanner:GetPendingRewardCount();
-    local total = GetMoneyString(GoldPlanner:GetTotalWorldQuestGold(), true);
-
-    if pending > 0 then
-        GoldPlanner:Log(
-            "Total world quest gold available:", total,
-            "(still waiting on reward data for", pending, "quests)"
-        );
-    else
-        GoldPlanner:Log("Total world quest gold available:", total);
-    end
-
-    GoldPlanner.UI.WorldQuests:Update();
-end
-
 function GoldPlanner:RefreshWorldQuestGold()
     self:ScanAllWorldQuests();
     GoldPlanner.UI.WorldQuests:Update();
-
-    local pending = self:GetPendingRewardCount();
-
-    if pending > 0 then
-        self:Log("Scan complete, waiting on reward data for", pending, "quests...");
-        wqReportPending = true;
-        C_Timer.After(5,  ReportWorldQuestTotal);
-    else
-        wqReportPending = true;
-        ReportWorldQuestTotal();
-    end
 end
 
 local function HandleSlashCommand(parameters)
@@ -197,17 +163,20 @@ local function HandleEvents(self, event, ...)
         GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
         GoldPlanner:UpdateStatsBox();
-    elseif event == EVENTS.QUEST_DATA_LOAD_RESULT then
-        local questID, success = ...;
-        if success and GoldPlanner.Runtime.PendingRewardData[questID] then
-            GoldPlanner.Runtime.PendingRewardData[questID] = nil;
-            GoldPlanner:HandleWorldQuestRewardData(questID);
+    elseif event == EVENTS.QUEST_LOG_UPDATE then
+        local pending = GoldPlanner.Runtime.PendingRewardData;
+        local resolvedAny = false;
 
-            ScheduleWorldQuestPanelUpdate();
-
-            if GoldPlanner:GetPendingRewardCount() == 0 then
-                ReportWorldQuestTotal();
+        for questID in pairs(pending) do
+            if HaveQuestRewardData(questID) then
+                GoldPlanner:HandleWorldQuestRewardData(questID);
+                pending[questID] = nil;
+                resolvedAny = true;
             end
+        end
+
+        if resolvedAny then
+            ScheduleWorldQuestPanelUpdate();
         end
     end
 end
@@ -217,5 +186,5 @@ eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
 eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
 eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
 eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
-eventFrame:RegisterEvent(EVENTS.QUEST_DATA_LOAD_RESULT);
+eventFrame:RegisterEvent(EVENTS.QUEST_LOG_UPDATE);
 eventFrame:SetScript("OnEvent", HandleEvents);

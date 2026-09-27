@@ -122,6 +122,7 @@ end
 
 function GoldPlanner:ClearWorldQuests()
     wipe(self.Runtime.WorldQuests);
+    wipe(self.Runtime.PendingRewardData);
 end
 
 function GoldPlanner:ScanWorldQuests(mapID)
