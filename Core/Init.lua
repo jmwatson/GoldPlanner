@@ -145,24 +145,24 @@ local function HandleEvents(self, event, ...)
         GoldPlanner:BuildSettings();
         GoldPlanner.UI.Dashboard:Build();
         GoldPlanner:BuildProgressBar();
-        GoldPlanner:BuildStatsBox();
+        GoldPlanner.UI.StatsBox:Build();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
         GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
-        GoldPlanner:UpdateStatsBox();
+        GoldPlanner.UI.StatsBox:Update();
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
-        GoldPlanner:UpdateStatsBox();
+        GoldPlanner.UI.StatsBox:Update();
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
         GoldPlanner.UI.Overview:Update();
         GoldPlanner:UpdateProgressBar();
-        GoldPlanner:UpdateStatsBox();
+        GoldPlanner.UI.StatsBox:Update();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
         local pending = GoldPlanner.Runtime.PendingRewardData;
         local resolvedAny = false;

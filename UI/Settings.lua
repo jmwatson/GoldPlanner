@@ -45,7 +45,7 @@ local function BuildGoalAmount(parent)
             GoldPlanner:SetGoal(gold * 10000);
             GoldPlanner.UI.Overview:Update();
             GoldPlanner:UpdateProgressBar();
-            GoldPlanner:UpdateStatsBox();
+            GoldPlanner.UI.StatsBox:Update();
         end
 
         self:ClearFocus();
@@ -76,7 +76,7 @@ local function BuildGoalDeadline(parent, anchor)
         if days and days > 0 then
             GoldPlanner:SetGoalDeadline(time() + (days * 86400));
             GoldPlanner.UI.Overview:Update();
-            GoldPlanner:UpdateStatsBox();
+            GoldPlanner.UI.StatsBox:Update();
         end
 
         self:ClearFocus();
@@ -210,7 +210,7 @@ local function BuildShowStatsBox(addonName, category, settings)
         name,
         defaultValue);
     showSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:ShowStatsBox(value);
+        GoldPlanner.UI.StatsBox:Show(value);
     end);
     Settings.CreateCheckbox(category, showSetting, description);
 
@@ -231,7 +231,7 @@ local function BuildLockStatsBox(addonName, category, settings)
         name,
         defaultValue);
     lockSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetStatsBoxLocked(value);
+        GoldPlanner.UI.StatsBox:SetLocked(value);
     end);
     Settings.CreateCheckbox(category, lockSetting, description);
 
@@ -260,7 +260,7 @@ local function BuildStatsPadding(addonName, category, settings)
     Settings.CreateSlider(category, paddingSetting, options, description);
 
     paddingSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetStatsBoxPadding(
+        GoldPlanner.UI.StatsBox:SetPadding(
             settings.padding,
             value
         );
@@ -307,7 +307,7 @@ function GoldPlanner:BuildSettings()
     end);
     local resetStatsBoxButton = CreateResetButton(panel, resetProgressBarButton, "Reset Stats Box", function()
         GoldPlanner:ResetStatsBoxSettings();
-        GoldPlanner:ApplyStatsBoxSettings();
+        GoldPlanner.UI.StatsBox:ApplySettings();
 
         local settings = GoldPlanner.db.settings.statsBox;
         showStatsBoxSetting:SetValue(settings.show);
