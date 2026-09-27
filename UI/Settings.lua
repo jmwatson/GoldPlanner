@@ -44,7 +44,7 @@ local function BuildGoalAmount(parent)
         if gold and gold > 0 then
             GoldPlanner:SetGoal(gold * 10000);
             GoldPlanner.UI.Overview:Update();
-            GoldPlanner:UpdateProgressBar();
+            GoldPlanner.UI.ProgressBar:Update();
             GoldPlanner.UI.StatsBox:Update();
         end
 
@@ -105,7 +105,7 @@ local function BuildShowProgressBar(addonName, category, settings)
         name,
         defaultValue);
     showSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:ShowProgressBar(value);
+        GoldPlanner.UI.ProgressBar:Show(value);
     end);
     Settings.CreateCheckbox(category, showSetting, description);
 
@@ -126,7 +126,7 @@ local function BuildLockProgressBar(addonName, category, settings)
         name,
         defaultValue);
     lockSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetProgressBarLocked(value);
+        GoldPlanner.UI.ProgressBar:SetLocked(value);
     end);
     Settings.CreateCheckbox(category, lockSetting, description);
 
@@ -154,7 +154,7 @@ local function BuildProgressWidth(addonName, category, settings)
     Settings.CreateSlider(category, widthSetting, widthOptions, description);
 
     widthSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetProgressBarSize(
+        GoldPlanner.UI.ProgressBar:SetSize(
             value,
             settings.height
         )
@@ -184,7 +184,7 @@ local function BuildProgressHeight(addonName, category, settings)
     Settings.CreateSlider(category, heightSetting, heightOptions, description);
 
     heightSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetProgressBarSize(
+        GoldPlanner.UI.ProgressBar:SetSize(
             settings.width,
             value
         );
@@ -296,8 +296,8 @@ function GoldPlanner:BuildSettings()
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
-        GoldPlanner:ResetProgressBar();
-        GoldPlanner:ApplyProgressBarSettings();
+        GoldPlanner.UI.ProgressBar:Reset();
+        GoldPlanner.UI.ProgressBar:ApplySettings();
 
         local settings = GoldPlanner.db.settings.progressBar;
         showProgressBarSetting:SetValue(settings.show);
