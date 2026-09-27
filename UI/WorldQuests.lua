@@ -66,12 +66,18 @@ function WorldQuests:Build(parent)
     totalText:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -10);
     totalText:SetText("Total Gold Available: " .. GetMoneyString(0, true));
 
-    local columnHeader = parent:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall");
-    columnHeader:SetPoint("TOPLEFT", totalText, "BOTTOMLEFT", 0, -14);
-    columnHeader:SetText("Gold" .. string.rep(" ", 12) .. "Quest (Zone)");
+    local columnHeaderGold = parent:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall");
+    columnHeaderGold:SetPoint("TOPLEFT", totalText, "BOTTOMLEFT", 0, -14);
+    columnHeaderGold:SetWidth(100);
+    columnHeaderGold:SetJustifyH("LEFT");
+    columnHeaderGold:SetText("Gold");
+
+    local columnHeaderTitle = parent:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall");
+    columnHeaderTitle:SetPoint("TOPLEFT", columnHeaderGold, "TOPRIGHT", 8, 0);
+    columnHeaderTitle:SetText("Quest (Zone)");
 
     local scrollFrame = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate");
-    scrollFrame:SetPoint("TOPLEFT", columnHeader, "BOTTOMLEFT", 0, -6);
+    scrollFrame:SetPoint("TOPLEFT", columnHeaderGold, "BOTTOMLEFT", 0, -6);
     scrollFrame:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -28, 0);
 
     local scrollChild = CreateFrame("Frame", nil, scrollFrame);
