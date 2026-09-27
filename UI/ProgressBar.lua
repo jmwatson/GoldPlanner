@@ -29,7 +29,7 @@ function ProgressBar:Build()
 
     frame:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing();
-        self:SavePosition();
+        ProgressBar:SavePosition();
     end);
 
     frame:SetShown(settings.show);
