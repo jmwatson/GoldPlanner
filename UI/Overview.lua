@@ -95,10 +95,11 @@ function Overview:Update()
     end
 
     local GP = GoldPlanner;
+    local Gold = GP.Data.Gold;
 
-    self.characterGold:SetText("Character: " .. GetMoneyString(GP:GetCharacter().copper, true));
-    self.warbandGold:SetText("Warband: " .. GetMoneyString(GP:GetWarband().copper, true));
-    self.totalGold:SetText("Total: " .. GetMoneyString(GP:GetTotalCopper(), true));
+    self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacter().copper, true));
+    self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarband().copper, true));
+    self.totalGold:SetText("Total: " .. GetMoneyString(Gold:GetTotalCopper(), true));
 
     local goal = GP:GetGoal();
 

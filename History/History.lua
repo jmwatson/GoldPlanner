@@ -71,7 +71,7 @@ local function CompactHistory(history, now)
 end
 
 function GoldPlanner:AddCharacterHistorySnapshot()
-    local character = self:GetCharacter();
+    local character = self.Data.Gold:GetCharacter();
     AddHistorySnapshot(character.history, character.copper);
 end
 
@@ -80,7 +80,7 @@ function GoldPlanner:AddWarbandHistorySnapshot()
 end
 
 function GoldPlanner:AddTotalHistorySnapshot()
-    AddHistorySnapshot(self.db.totalHistory, self:GetTotalCopper());
+    AddHistorySnapshot(self.db.totalHistory, self.Data.Gold:GetTotalCopper());
 end
 
 function GoldPlanner:ScheduleTotalHistorySnapshot()

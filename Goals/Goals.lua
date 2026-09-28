@@ -15,7 +15,7 @@ function GoldPlanner:GetGoal()
 end
 
 function GoldPlanner:GetGoalRemaining()
-    local remaining = self:GetGoal() - self:GetTotalCopper();
+    local remaining = self:GetGoal() - self.Data.Gold:GetTotalCopper();
     return math.max(remaining, 0);
 end
 
@@ -26,7 +26,7 @@ function GoldPlanner:GetGoalProgress()
         return nil;
     end
 
-    return math.min(self:GetTotalCopper() / goal, 1);
+    return math.min(self.Data.Gold:GetTotalCopper() / goal, 1);
 end
 
 function GoldPlanner:SetGoalDeadline(timestamp)

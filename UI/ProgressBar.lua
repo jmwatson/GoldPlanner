@@ -73,7 +73,7 @@ function ProgressBar:Update()
     local frame = self.progressBar;
     local bar = frame.progress.bar;
     local goal = GoldPlanner:GetGoal();
-    local total = GoldPlanner:GetTotalCopper();
+    local total = GoldPlanner.Data.Gold:GetTotalCopper();
 
     if goal <= 0 then
         bar:SetValue(0);
