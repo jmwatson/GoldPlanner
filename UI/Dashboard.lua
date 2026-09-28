@@ -51,7 +51,7 @@ function Dashboard:Build()
     title:SetPoint("TOP", 0, -5);
     title:SetText(GoldPlanner.STRINGS.ADDON_TITLE);
 
-    local navMenu = GoldPlanner:CreateNavMenu(dashboard, NAV_WIDTH);
+    local navMenu = GoldPlanner.UI.NavMenu:Create(dashboard, NAV_WIDTH);
     navMenu:SetPoint("TOPLEFT", dashboard, "TOPLEFT", 4, -30);
     navMenu:SetPoint("BOTTOMLEFT", dashboard, "BOTTOMLEFT", 4, 4);
 

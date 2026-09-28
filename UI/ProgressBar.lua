@@ -2,7 +2,13 @@ local _, GoldPlanner = ...;
 
 local trim = GoldPlanner.TrimGold;
 
-function GoldPlanner:BuildProgressBar()
+local ProgressBar = {};
+
+GoldPlanner.UI = GoldPlanner.UI or {};
+
+GoldPlanner.UI.ProgressBar = ProgressBar;
+
+function ProgressBar:Build()
     if self.progressBar then
         return;
     end
@@ -23,7 +29,7 @@ function GoldPlanner:BuildProgressBar()
 
     frame:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing();
-        GoldPlanner:SaveProgressBarPosition();
+        ProgressBar:SavePosition();
     end);
 
     frame:SetShown(settings.show);
@@ -55,10 +61,10 @@ function GoldPlanner:BuildProgressBar()
 
     self.progressBar = frame;
 
-    self:UpdateProgressBar();
+    self:Update();
 end
 
-function GoldPlanner:UpdateProgressBar()
+function ProgressBar:Update()
     if not self.progressBar then
         return;
     end
@@ -66,14 +72,14 @@ function GoldPlanner:UpdateProgressBar()
     local sformat = string.format;
     local frame = self.progressBar;
     local bar = frame.progress.bar;
-    local goal = self:GetGoal();
-    local total = self:GetTotalCopper();
+    local goal = GoldPlanner:GetGoal();
+    local total = GoldPlanner:GetTotalCopper();
 
     if goal <= 0 then
         bar:SetValue(0);
-        bar.text:SetText(self.STRINGS.EMPTY_STRING);
+        bar.text:SetText(GoldPlanner.STRINGS.EMPTY_STRING);
     else
-        local goalProgress = self:GetGoalProgress();
+        local goalProgress = GoldPlanner:GetGoalProgress();
         local text = frame:GetWidth() >= 200 and
             sformat("%s / %s", GetMoneyString(trim(total), true), GetMoneyString(trim(goal), true)) or
             sformat("%.1f%%", goalProgress * 100);
@@ -82,11 +88,11 @@ function GoldPlanner:UpdateProgressBar()
     end
 end
 
-function GoldPlanner:ApplyProgressBarSettings()
+function ProgressBar:ApplySettings()
     local frame = self.progressBar;
 
     if frame then
-        local settings = self.db.settings.progressBar;
+        local settings = GoldPlanner.db.settings.progressBar;
 
         frame:ClearAllPoints();
         frame:SetPoint(settings.point, UIParent, settings.point, settings.x, settings.y);
@@ -94,54 +100,54 @@ function GoldPlanner:ApplyProgressBarSettings()
         frame:EnableMouse(not settings.locked);
         frame:SetShown(settings.show);
 
-        GoldPlanner:SetProgressBarBorderColor(settings.borderColor);
-        GoldPlanner:SetProgressBarColor(settings.fillColor);
+        self:SetBorderColor(settings.borderColor);
+        self:SetColor(settings.fillColor);
     end
 end
 
 
-function GoldPlanner:SetProgressBarSize(width, height)
+function ProgressBar:SetSize(width, height)
     if self.progressBar then
-        self.db.settings.progressBar.width = width;
-        self.db.settings.progressBar.height = height;
+        GoldPlanner.db.settings.progressBar.width = width;
+        GoldPlanner.db.settings.progressBar.height = height;
         self.progressBar:SetSize(width, height);
     end
 end
 
-function GoldPlanner:SetProgressBarColor(fill)
+function ProgressBar:SetColor(fill)
     if self.progressBar then
-        self.db.settings.progressBar.fillColor = fill;
+        GoldPlanner.db.settings.progressBar.fillColor = fill;
         self.progressBar.progress.bar:SetStatusBarColor(fill[1], fill[2], fill[3]);
     end
 end
 
-function GoldPlanner:SetProgressBarBorderColor(border)
+function ProgressBar:SetBorderColor(border)
     if self.progressBar then
-        self.db.settings.progressBar.borderColor = border;
+        GoldPlanner.db.settings.progressBar.borderColor = border;
         self.progressBar.progress:SetBackdropBorderColor(border[1], border[2], border[3], border[4]);
     end
 end
 
-function GoldPlanner:SetProgressBarLocked(lock)
+function ProgressBar:SetLocked(lock)
     if self.progressBar then
-        self.db.settings.progressBar.locked = lock;
+        GoldPlanner.db.settings.progressBar.locked = lock;
         self.progressBar:EnableMouse(not lock);
     end
 end
 
-function GoldPlanner:ShowProgressBar(show)
+function ProgressBar:Show(show)
     if self.progressBar then
-        self.db.settings.progressBar.show = show;
+        GoldPlanner.db.settings.progressBar.show = show;
         self.progressBar:SetShown(show);
     end
 end
 
-function GoldPlanner:SaveProgressBarPosition()
+function ProgressBar:SavePosition()
     local frame = self.progressBar;
 
     if frame then
         local point, _, _, x, y = frame:GetPoint();
-        local settings = self.db.settings.progressBar;
+        local settings = GoldPlanner.db.settings.progressBar;
 
         settings.point = point;
         settings.x = x;

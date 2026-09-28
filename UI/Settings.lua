@@ -1,5 +1,10 @@
 local _, GoldPlanner = ...;
 
+GoldPlanner.UI = GoldPlanner.UI or {};
+
+local _Settings = {};
+GoldPlanner.UI.Settings = _Settings;
+
 local fontOptions = {
     "GameFontNormalHuge",
     "GameFontNormalLarge",
@@ -44,8 +49,8 @@ local function BuildGoalAmount(parent)
         if gold and gold > 0 then
             GoldPlanner:SetGoal(gold * 10000);
             GoldPlanner.UI.Overview:Update();
-            GoldPlanner:UpdateProgressBar();
-            GoldPlanner:UpdateStatsBox();
+            GoldPlanner.UI.ProgressBar:Update();
+            GoldPlanner.UI.StatsBox:Update();
         end
 
         self:ClearFocus();
@@ -76,7 +81,7 @@ local function BuildGoalDeadline(parent, anchor)
         if days and days > 0 then
             GoldPlanner:SetGoalDeadline(time() + (days * 86400));
             GoldPlanner.UI.Overview:Update();
-            GoldPlanner:UpdateStatsBox();
+            GoldPlanner.UI.StatsBox:Update();
         end
 
         self:ClearFocus();
@@ -105,7 +110,7 @@ local function BuildShowProgressBar(addonName, category, settings)
         name,
         defaultValue);
     showSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:ShowProgressBar(value);
+        GoldPlanner.UI.ProgressBar:Show(value);
     end);
     Settings.CreateCheckbox(category, showSetting, description);
 
@@ -126,7 +131,7 @@ local function BuildLockProgressBar(addonName, category, settings)
         name,
         defaultValue);
     lockSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetProgressBarLocked(value);
+        GoldPlanner.UI.ProgressBar:SetLocked(value);
     end);
     Settings.CreateCheckbox(category, lockSetting, description);
 
@@ -154,7 +159,7 @@ local function BuildProgressWidth(addonName, category, settings)
     Settings.CreateSlider(category, widthSetting, widthOptions, description);
 
     widthSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetProgressBarSize(
+        GoldPlanner.UI.ProgressBar:SetSize(
             value,
             settings.height
         )
@@ -184,7 +189,7 @@ local function BuildProgressHeight(addonName, category, settings)
     Settings.CreateSlider(category, heightSetting, heightOptions, description);
 
     heightSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetProgressBarSize(
+        GoldPlanner.UI.ProgressBar:SetSize(
             settings.width,
             value
         );
@@ -210,7 +215,7 @@ local function BuildShowStatsBox(addonName, category, settings)
         name,
         defaultValue);
     showSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:ShowStatsBox(value);
+        GoldPlanner.UI.StatsBox:Show(value);
     end);
     Settings.CreateCheckbox(category, showSetting, description);
 
@@ -231,7 +236,7 @@ local function BuildLockStatsBox(addonName, category, settings)
         name,
         defaultValue);
     lockSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetStatsBoxLocked(value);
+        GoldPlanner.UI.StatsBox:SetLocked(value);
     end);
     Settings.CreateCheckbox(category, lockSetting, description);
 
@@ -260,7 +265,7 @@ local function BuildStatsPadding(addonName, category, settings)
     Settings.CreateSlider(category, paddingSetting, options, description);
 
     paddingSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner:SetStatsBoxPadding(
+        GoldPlanner.UI.StatsBox:SetPadding(
             settings.padding,
             value
         );
@@ -279,8 +284,8 @@ local function CreateResetButton(parent, anchor, text, onClickCallback)
         return button;
 end
 
-function GoldPlanner:BuildSettings()
-    if self.settingsCategory then
+function _Settings:Build()
+    if self.category then
         return;
     end
 
@@ -290,14 +295,14 @@ function GoldPlanner:BuildSettings()
     local showStatsBoxSetting, lockStatsBoxSetting, paddingStatsBoxSetting;
 
     local panel = CreateFrame("Frame");
-    local category = Settings.RegisterCanvasLayoutCategory(panel, self.STRINGS.ADDON_TITLE);
+    local category = Settings.RegisterCanvasLayoutCategory(panel, GoldPlanner.STRINGS.ADDON_TITLE);
     Settings.RegisterAddOnCategory(category);
 
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
         GoldPlanner:ResetProgressBar();
-        GoldPlanner:ApplyProgressBarSettings();
+        GoldPlanner.UI.ProgressBar:ApplySettings();
 
         local settings = GoldPlanner.db.settings.progressBar;
         showProgressBarSetting:SetValue(settings.show);
@@ -307,7 +312,7 @@ function GoldPlanner:BuildSettings()
     end);
     local resetStatsBoxButton = CreateResetButton(panel, resetProgressBarButton, "Reset Stats Box", function()
         GoldPlanner:ResetStatsBoxSettings();
-        GoldPlanner:ApplyStatsBoxSettings();
+        GoldPlanner.UI.StatsBox:ApplySettings();
 
         local settings = GoldPlanner.db.settings.statsBox;
         showStatsBoxSetting:SetValue(settings.show);
@@ -325,7 +330,7 @@ function GoldPlanner:BuildSettings()
     local progressBarCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Progress Bar");
     Settings.RegisterAddOnCategory(progressBarCategory);
 
-    local progressBarSettings = self.db.settings.progressBar;
+    local progressBarSettings = GoldPlanner.db.settings.progressBar;
     showProgressBarSetting = BuildShowProgressBar(addonName, progressBarCategory, progressBarSettings);
     lockProgressBarSetting = BuildLockProgressBar(addonName, progressBarCategory, progressBarSettings);
     widthProgressBarSetting = BuildProgressWidth(addonName, progressBarCategory, progressBarSettings);
@@ -334,10 +339,10 @@ function GoldPlanner:BuildSettings()
     local statsBoxCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Stats Box");
     Settings.RegisterAddOnCategory(statsBoxCategory);
 
-    local statsBoxSettings = self.db.settings.statsBox;
+    local statsBoxSettings = GoldPlanner.db.settings.statsBox;
     showStatsBoxSetting = BuildShowStatsBox(addonName, statsBoxCategory, statsBoxSettings);
     lockStatsBoxSetting = BuildLockStatsBox(addonName, statsBoxCategory, statsBoxSettings);
     paddingStatsBoxSetting = BuildStatsPadding(addonName, statsBoxCategory, statsBoxSettings);
 
-    self.settingsCategory = category;
+    self.category = category;
 end

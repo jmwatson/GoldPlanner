@@ -8,12 +8,13 @@ local SECONDS_PER_DAY = 86400;
 
 local function HandleBarCommand(value)
     local subcommand, rest = value:match("^(%S+)%s*(.*)$");
+    local ProgressBar = GoldPlanner.UI.ProgressBar;
  
     if subcommand == "lock" then
-        GoldPlanner:SetProgressBarLocked(true);
+        ProgressBar:SetLocked(true);
         GoldPlanner:Log("Progress bar locked.");
     elseif subcommand == "unlock" then
-        GoldPlanner:SetProgressBarLocked(false);
+        ProgressBar:SetLocked(false);
         GoldPlanner:Log("Progress bar unlocked.");
     elseif subcommand == "size" then
         local width, height = rest:match("^(%d+)%s+(%d+)$");
@@ -24,7 +25,7 @@ local function HandleBarCommand(value)
             return;
         end
  
-        GoldPlanner:SetProgressBarSize(width, height);
+        ProgressBar:SetSize(width, height);
         GoldPlanner:Log(string.format("Progress bar resized to %dx%d.", width, height));
     elseif subcommand == "color" then
         local r, g, b = rest:match("^([%d.]+)%s+([%d.]+)%s+([%d.]+)$");
@@ -35,7 +36,7 @@ local function HandleBarCommand(value)
             return;
         end
  
-        GoldPlanner:SetProgressBarColor({r, g, b});
+        ProgressBar:SetColor({r, g, b});
         GoldPlanner:Log("Progress bar color updated.");
     elseif subcommand == "bordercolor" then
         local r, g, b = rest:match("^([%d.]+)%s+([%d.]+)%s+([%d.]+)$");
@@ -46,16 +47,16 @@ local function HandleBarCommand(value)
             return;
         end
  
-        GoldPlanner:SetProgressBarBorderColor({r, g, b});
+        ProgressBar:SetBorderColor({r, g, b});
         GoldPlanner:Log("Progress bar border color updated.");
     elseif subcommand == "reset" then
-        GoldPlanner:ResetProgressBar();
-        GoldPlanner:ApplyProgressBarSettings();
+        ProgressBar:Reset();
+        ProgressBar:ApplySettings();
         GoldPlanner:Log("Progress bar reset to defaults.");
     elseif subcommand == "show" then
-        GoldPlanner:ShowProgressBar(true);
+        ProgressBar:Show(true);
     elseif subcommand == "hide" then
-        GoldPlanner:ShowProgressBar(false);
+        ProgressBar:Show(false);
     else
         GoldPlanner:Log("Usage: /gp bar <lock|unlock|size|color|bordercolor|show|hide|reset>");
     end
@@ -101,13 +102,13 @@ local function HandleSlashCommand(parameters)
 
         GoldPlanner:SetGoal(gold * 10000);
         GoldPlanner.UI.Overview:Update();
-        GoldPlanner:UpdateProgressBar();
+        GoldPlanner.UI.ProgressBar:Update();
 
         GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
     elseif command == "bar" then
         HandleBarCommand(value);
     elseif command == "settings" then
-        Settings.OpenToCategory(GoldPlanner.settingsCategory:GetID());
+        Settings.OpenToCategory(GoldPlanner.UI.Settings.category:GetID());
     elseif command == "maps" then
         GoldPlanner:PrintMapChain();
     elseif command == "wq" then
@@ -133,6 +134,10 @@ local function RegisterSlashCommands()
 end
 
 local function HandleEvents(self, event, ...)
+    local Overview = GoldPlanner.UI.Overview;
+    local StatsBox = GoldPlanner.UI.StatsBox;
+    local ProgressBar = GoldPlanner.UI.ProgressBar;
+
     if event == EVENTS.ADDON_LOADED then
         local loadedAddonName = ...;
 
@@ -142,27 +147,27 @@ local function HandleEvents(self, event, ...)
 
         GoldPlanner:InitializeDatabase();
         GoldPlanner:CompactAllHistory();
-        GoldPlanner:BuildSettings();
+        GoldPlanner.UI.Settings:Build();
         GoldPlanner.UI.Dashboard:Build();
-        GoldPlanner:BuildProgressBar();
-        GoldPlanner:BuildStatsBox();
+        ProgressBar:Build();
+        StatsBox:Build();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         GoldPlanner:UpdateCharacterCopper();
         GoldPlanner:UpdateWarbandCopper();
-        GoldPlanner.UI.Overview:Update();
-        GoldPlanner:UpdateProgressBar();
-        GoldPlanner:UpdateStatsBox();
+        Overview:Update();
+        ProgressBar:Update();
+        StatsBox:Update();
     elseif event == EVENTS.PLAYER_MONEY then
         GoldPlanner:UpdateCharacterCopper();
-        GoldPlanner.UI.Overview:Update();
-        GoldPlanner:UpdateProgressBar();
-        GoldPlanner:UpdateStatsBox();
+        Overview:Update();
+        ProgressBar:Update();
+        StatsBox:Update();
     elseif event == EVENTS.ACCOUNT_MONEY then
         GoldPlanner:UpdateWarbandCopper();
-        GoldPlanner.UI.Overview:Update();
-        GoldPlanner:UpdateProgressBar();
-        GoldPlanner:UpdateStatsBox();
+        Overview:Update();
+        ProgressBar:Update();
+        StatsBox:Update();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
         local pending = GoldPlanner.Runtime.PendingRewardData;
         local resolvedAny = false;
