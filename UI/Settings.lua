@@ -33,6 +33,8 @@ local fontOptions = {
 };
 
 local function BuildGoalAmount(parent)
+    local Goal = GoldPlanner.Data.Goal;
+
     local title = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
     title:SetPoint("TOPLEFT", 16, -16);
     title:SetText("Goal Amount (gold)");
@@ -47,7 +49,7 @@ local function BuildGoalAmount(parent)
         local gold = tonumber(self:GetText());
 
         if gold and gold > 0 then
-            GoldPlanner:SetGoal(gold * 10000);
+            Goal:Set(gold * 10000);
             GoldPlanner.UI.Overview:Update();
             GoldPlanner.UI.ProgressBar:Update();
             GoldPlanner.UI.StatsBox:Update();
@@ -57,7 +59,7 @@ local function BuildGoalAmount(parent)
     end);
 
     editbox:SetScript("OnEscapePressed", function(self)
-        editbox:SetText(tostring(math.floor(GoldPlanner:GetGoal() / 10000)));
+        editbox:SetText(tostring(math.floor(Goal:Get() / 10000)));
         self:ClearFocus();
     end);
 
@@ -79,7 +81,7 @@ local function BuildGoalDeadline(parent, anchor)
         local days = tonumber(self:GetText());
 
         if days and days > 0 then
-            GoldPlanner:SetGoalDeadline(time() + (days * 86400));
+            GoldPlanner.Data.Goal:SetDeadline(time() + (days * 86400));
             GoldPlanner.UI.Overview:Update();
             GoldPlanner.UI.StatsBox:Update();
         end
@@ -321,10 +323,9 @@ function _Settings:Build()
     end);
 
     panel:SetScript("OnShow", function(self)
-        goalEditBox:SetText(tostring(math.floor(GoldPlanner:GetGoal() / 10000)));
-
-        local deadline = GoldPlanner.db.goal.deadline;
-        deadlineEditBox:SetText(deadline and tostring(math.floor((GoldPlanner.db.goal.deadline - time()) / 86400)) or "");
+        local Goal = GoldPlanner.Data.Goal;
+        goalEditBox:SetText(tostring(math.floor(Goal:Get() / 10000)));
+        deadlineEditBox:SetText(Goal:GetDeadline() and tostring(math.floor((Goal:GetDeadline() - time()) / 86400)) or "");
     end);
 
     local progressBarCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Progress Bar");

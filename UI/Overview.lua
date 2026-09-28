@@ -96,12 +96,13 @@ function Overview:Update()
 
     local GP = GoldPlanner;
     local Gold = GP.Data.Gold;
+    local Goal = GP.Data.Goal;
 
     self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacter().copper, true));
     self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarband().copper, true));
     self.totalGold:SetText("Total: " .. GetMoneyString(Gold:GetTotalCopper(), true));
 
-    local goal = GP:GetGoal();
+    local goal = Goal:Get();
 
     if goal <= 0 then
         self.goal:SetText(GP.STRINGS.GOAL .. ": " .. GP.STRINGS.NO_GOAL);
@@ -111,9 +112,9 @@ function Overview:Update()
         self.timeToGoal:SetText(string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
     else
         local timeToGoal = GP:GetTimeToGoalDisplay();
-        local goalProgress = GP:GetGoalProgress();
+        local goalProgress = Goal:GetProgress();
         self.goal:SetText(string.format("%s: %s", GP.STRINGS.GOAL, GetMoneyString(goal, true)));
-        self.remaining:SetText(string.format("%s: %s", GP.STRINGS.REMAINING, GetMoneyString(GP:GetGoalRemaining(), true)));
+        self.remaining:SetText(string.format("%s: %s", GP.STRINGS.REMAINING, GetMoneyString(Goal:GetRemaining(), true)));
         self.progress.bar:SetValue(goalProgress);
         self.progress.bar.text:SetText(string.format("%.1f%%", goalProgress * 100));
         self.timeToGoal:SetText(timeToGoal and

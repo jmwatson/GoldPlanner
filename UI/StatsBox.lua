@@ -55,9 +55,10 @@ function StatsBox:Update()
         return;
     end
 
+    local GP = GoldPlanner;
     local sformat = string.format;
     local frame = self.statsBox;
-    local goal = GoldPlanner:GetGoal();
+    local goal = GP.Data.Goal:Get();
 
     if goal <= 0 then
         frame.timeToGoal:SetText(sformat("%s: %s", GoldPlanner.STRINGS.TIME_TO_GOAL, GoldPlanner.STRINGS.NO_GOAL));

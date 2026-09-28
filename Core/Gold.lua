@@ -42,7 +42,7 @@ function Gold:GetTotalCopper()
 end
 
 function Gold:UpdateCharacterCopper()
-    local character = self:GetCharacter();
+    local character = Gold:GetCharacter();
 
     character.copper = GetMoney();
 
