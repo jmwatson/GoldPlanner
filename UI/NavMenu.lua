@@ -1,18 +1,9 @@
 local _, GoldPlanner = ...;
 
--- A left-hand navigation menu for the dashboard (or any frame). It owns its
--- own item list and selection state; callers just hand it a label, the panel
--- that label should reveal, and (optionally) a callback to run on selection.
---
--- Usage:
---   local navMenu = GoldPlanner:CreateNavMenu(parent);
---   navMenu:SetPoint(...); -- position/size it like any frame
---   navMenu:AddItem("Overview", overviewPanel);
---   navMenu:AddItem("Activities", activitiesPanel, function() ... end);
---
--- The first item added is selected by default. AddItem hides the panel it's
--- given; the nav menu takes over showing/hiding every panel it knows about
--- from then on, so callers should not toggle those panels themselves.
+GoldPlanner.UI = GoldPlanner.UI or {};
+
+local NavMenu = {};
+GoldPlanner.UI.NavMenu = NavMenu;
 
 local NAV_ITEM_HEIGHT = 24;
 local NAV_ITEM_SPACING = 2;
@@ -23,9 +14,6 @@ local UNSELECTED_COLOR = { 0.8, 0.8, 0.8 };
 
 local NavMenuMixin = {};
 
--- text: label shown in the menu.
--- panel: the frame to show when this item is selected (and hide otherwise).
--- onSelect: optional function called every time this item becomes selected.
 function NavMenuMixin:AddItem(text, panel, onSelect)
     local index = #self.items + 1;
 
@@ -102,7 +90,7 @@ function NavMenuMixin:SelectItem(index)
 end
 
 -- width: optional, defaults to 110.
-function GoldPlanner:CreateNavMenu(parent, width)
+function NavMenu:Create(parent, width)
     local menu = CreateFrame("Frame", nil, parent);
     menu:SetWidth(width or 110);
     menu.items = {};
