@@ -89,6 +89,10 @@ function History:AddTotalSnapshot()
     AddHistorySnapshot(GoldPlanner.db.totalHistory, GoldPlanner.Data.Gold:GetTotalCopper());
 end
 
+function History:GetTotal()
+    return GoldPlanner.db.totalHistory;
+end
+
 function History:ScheduleTotalSnapshot()
     if totalHistoryPending then
         return;

@@ -97,6 +97,7 @@ function Overview:Update()
     local GP = GoldPlanner;
     local Gold = GP.Data.Gold;
     local Goal = GP.Data.Goal;
+    local Stats = GP.Data.Statistics;
 
     self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacter().copper, true));
     self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarband().copper, true));
@@ -111,7 +112,7 @@ function Overview:Update()
         self.progress.bar.text:SetText(GP.STRINGS.EMPTY_STRING);
         self.timeToGoal:SetText(string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
     else
-        local timeToGoal = GP:GetTimeToGoalDisplay();
+        local timeToGoal = Stats:GetTimeToGoalDisplay();
         local goalProgress = Goal:GetProgress();
         self.goal:SetText(string.format("%s: %s", GP.STRINGS.GOAL, GetMoneyString(goal, true)));
         self.remaining:SetText(string.format("%s: %s", GP.STRINGS.REMAINING, GetMoneyString(Goal:GetRemaining(), true)));
@@ -122,12 +123,12 @@ function Overview:Update()
             string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
     end
 
-    local rateDisplay = GP:GetMoneyRateDisplay();
+    local rateDisplay = Stats:GetMoneyRateDisplay();
     self.rate:SetText(rateDisplay and
         string.format("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
         string.format("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
 
-    local dailyGoalDisplay = GP:GetDailyGoalDisplay();
+    local dailyGoalDisplay = Stats:GetDailyGoalDisplay();
     self.dailyGoal:SetText(dailyGoalDisplay and
         string.format("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
         string.format("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
