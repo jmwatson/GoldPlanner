@@ -56,6 +56,7 @@ function StatsBox:Update()
     end
 
     local GP = GoldPlanner;
+    local Stats = GP.Data.Statistics;
     local sformat = string.format;
     local frame = self.statsBox;
     local goal = GP.Data.Goal:Get();
@@ -63,18 +64,18 @@ function StatsBox:Update()
     if goal <= 0 then
         frame.timeToGoal:SetText(sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
     else
-        local timeToGoal = GP:GetTimeToGoalDisplay();
+        local timeToGoal = Stats:GetTimeToGoalDisplay();
         frame.timeToGoal:SetText(timeToGoal and
             sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, timeToGoal) or
             sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
 
-        local dailyGoalDisplay = GP:GetDailyGoalDisplay();
+        local dailyGoalDisplay = Stats:GetDailyGoalDisplay();
         frame.dailyGoal:SetText(dailyGoalDisplay and
             sformat("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
             sformat("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
     end
 
-    local rateDisplay = GP:GetMoneyRateDisplay(self.TrimGold);
+    local rateDisplay = Stats:GetMoneyRateDisplay(GP.TrimGold);
     frame.rate:SetText(rateDisplay and
         sformat("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
         sformat("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
