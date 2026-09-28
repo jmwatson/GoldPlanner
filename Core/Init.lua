@@ -78,7 +78,7 @@ local function ScheduleWorldQuestPanelUpdate()
 end
 
 function GoldPlanner:RefreshWorldQuestGold()
-    self:ScanAllWorldQuests();
+    GoldPlanner.Activities.WorldQuests:ScanAll();
     GoldPlanner.UI.WorldQuests:Update();
 end
 
@@ -171,12 +171,13 @@ local function HandleEvents(self, event, ...)
         ProgressBar:Update();
         StatsBox:Update();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
+        local WQ = GoldPlanner.Activities.WorldQuests;
         local pending = GoldPlanner.Runtime.PendingRewardData;
         local resolvedAny = false;
 
         for questID in pairs(pending) do
             if HaveQuestRewardData(questID) then
-                GoldPlanner:HandleWorldQuestRewardData(questID);
+                WQ:HandleRewardData(questID);
                 pending[questID] = nil;
                 resolvedAny = true;
             end
