@@ -90,6 +90,7 @@ local function HandleSlashCommand(parameters)
         local amount, days = value:match("^(%S+)%s*(%S*)$");
         local gold = tonumber(amount);
         local days = tonumber(days);
+        local Goal = GoldPlanner.Data.Goal;
 
         if not gold or gold <= 0 then
             GoldPlanner:Log(usage);
@@ -97,14 +98,14 @@ local function HandleSlashCommand(parameters)
         end
 
         if days and days > 0 then
-            GoldPlanner:SetGoalDeadline(time() + days * SECONDS_PER_DAY);
+            Goal:SetDeadline(time() + days * SECONDS_PER_DAY);
         end
 
-        GoldPlanner:SetGoal(gold * 10000);
+        Goal:Set(gold * 10000);
         GoldPlanner.UI.Overview:Update();
         GoldPlanner.UI.ProgressBar:Update();
 
-        GoldPlanner:Log("Goal set to", GetMoneyString(GoldPlanner:GetGoal(), true));
+        GoldPlanner:Log("Goal set to", GetMoneyString(Goal:Get(), true));
     elseif command == "bar" then
         HandleBarCommand(value);
     elseif command == "settings" then

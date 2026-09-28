@@ -72,14 +72,14 @@ function ProgressBar:Update()
     local sformat = string.format;
     local frame = self.progressBar;
     local bar = frame.progress.bar;
-    local goal = GoldPlanner:GetGoal();
+    local goal = GoldPlanner.Data.Goal:Get();
     local total = GoldPlanner.Data.Gold:GetTotalCopper();
 
     if goal <= 0 then
         bar:SetValue(0);
         bar.text:SetText(GoldPlanner.STRINGS.EMPTY_STRING);
     else
-        local goalProgress = GoldPlanner:GetGoalProgress();
+        local goalProgress = GoldPlanner.Data.Goal:GetProgress();
         local text = frame:GetWidth() >= 200 and
             sformat("%s / %s", GetMoneyString(trim(total), true), GetMoneyString(trim(goal), true)) or
             sformat("%.1f%%", goalProgress * 100);

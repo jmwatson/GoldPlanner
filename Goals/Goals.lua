@@ -1,44 +1,53 @@
 local _, GoldPlanner = ...;
 
+GoldPlanner.Data = GoldPlanner.Data or {};
+
+local Goal = {};
+GoldPlanner.Data.Goal = Goal;
+
 local DAY = 86400;
 
-function GoldPlanner:SetGoal(copper)
+function Goal:Set(copper)
     if type(copper) ~= "number" or copper < 0 then
         error("Goal must be a non-negative number.");
     end
 
-    self.db.goal.copper = copper;
+    GoldPlanner.db.goal.copper = copper;
 end
 
-function GoldPlanner:GetGoal()
-    return self.db.goal.copper;
+function Goal:Get()
+    return GoldPlanner.db.goal.copper;
 end
 
-function GoldPlanner:GetGoalRemaining()
-    local remaining = self:GetGoal() - self.Data.Gold:GetTotalCopper();
+function Goal:GetRemaining()
+    local remaining = self:Get() - GoldPlanner.Data.Gold.GetTotalCopper();
     return math.max(remaining, 0);
 end
 
-function GoldPlanner:GetGoalProgress()
-    local goal = self:GetGoal();
+function Goal:GetProgress()
+    local goal = self:Get();
 
     if goal <= 0 then
         return nil;
     end
 
-    return math.min(self.Data.Gold:GetTotalCopper() / goal, 1);
+    return math.min(GoldPlanner.Data.Gold.GetTotalCopper() / goal, 1);
 end
 
-function GoldPlanner:SetGoalDeadline(timestamp)
-    self.db.goal.deadline = timestamp;
+function Goal:SetDeadline(timestamp)
+    if type(timestamp) ~= "number" then
+        error("Deadline must be a number");
+    end
+
+    GoldPlanner.db.goal.deadline = timestamp;
 end
 
-function GoldPlanner:GetGoalDeadline()
-    return self.db.goal.deadline;
+function Goal:GetDeadline()
+    return GoldPlanner.db.goal.deadline;
 end
 
-function GoldPlanner:GetDaysRemaining()
-    local deadline = self.db.goal.deadline;
+function Goal:GetDaysRemaining()
+    local deadline = self:GetDeadline();
 
     if not deadline then
         return nil;
@@ -53,14 +62,14 @@ function GoldPlanner:GetDaysRemaining()
     return math.ceil(secondsRemaining / DAY);
 end
 
-function GoldPlanner:GetDailyGoal()
+function Goal:GetDaily()
     local daysRemaining = self:GetDaysRemaining();
 
     if not daysRemaining then
         return nil;
     end
 
-    local remaining = self:GetGoalRemaining();
+    local remaining = self:GetRemaining();
 
     if remaining <= 0 then
         return 0;
