@@ -61,23 +61,23 @@ function StatsBox:Update()
     local goal = GP.Data.Goal:Get();
 
     if goal <= 0 then
-        frame.timeToGoal:SetText(sformat("%s: %s", GoldPlanner.STRINGS.TIME_TO_GOAL, GoldPlanner.STRINGS.NO_GOAL));
+        frame.timeToGoal:SetText(sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
     else
-        local timeToGoal = GoldPlanner:GetTimeToGoalDisplay();
+        local timeToGoal = GP:GetTimeToGoalDisplay();
         frame.timeToGoal:SetText(timeToGoal and
-            sformat("%s: %s", GoldPlanner.STRINGS.TIME_TO_GOAL, timeToGoal) or
-            sformat("%s: %s", GoldPlanner.STRINGS.TIME_TO_GOAL, GoldPlanner.STRINGS.UNAVAILABLE));
+            sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, timeToGoal) or
+            sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
 
-        local dailyGoalDisplay = GoldPlanner:GetDailyGoalDisplay();
+        local dailyGoalDisplay = GP:GetDailyGoalDisplay();
         frame.dailyGoal:SetText(dailyGoalDisplay and
-            sformat("%s: %s", GoldPlanner.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
-            sformat("%s: %s", GoldPlanner.STRINGS.DAILY_GOAL, GoldPlanner.STRINGS.NO_DEADLINE));
+            sformat("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
+            sformat("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
     end
 
-    local rateDisplay = GoldPlanner:GetMoneyRateDisplay(self.TrimGold);
+    local rateDisplay = GP:GetMoneyRateDisplay(self.TrimGold);
     frame.rate:SetText(rateDisplay and
-        sformat("%s: %s/hour", GoldPlanner.STRINGS.RATE, rateDisplay) or
-        sformat("%s: %s", GoldPlanner.STRINGS.RATE, GoldPlanner.STRINGS.NOT_ENOUGH_DATA));
+        sformat("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
+        sformat("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
 
     local width = math.max(frame.rate:GetStringWidth(), frame.timeToGoal:GetStringWidth(), frame.dailyGoal:GetStringWidth());
     local height = frame.rate:GetStringHeight() + frame.timeToGoal:GetStringHeight() + frame.dailyGoal:GetStringHeight();
