@@ -2,8 +2,10 @@
 ## Title: Gold Planner
 ## Notes: Plan, track, and reach your gold goals.
 ## Author: AgentPrometheus
-## Version: 0.1.0
+## Version: 0.2.0
 ## SavedVariables: GoldPlannerDB
+## IconTexture: Interface\Icons\Inv_misc_coin_01
+## Category: Inventory
 
 Core/Constants.lua
 Core/Utils.lua
