@@ -154,3 +154,13 @@ function ProgressBar:SavePosition()
         settings.y = y;
     end
 end
+
+function ProgressBar:ResetProgressBar()
+    local DB = GoldPlanner.DB;
+
+    if not DB:IsInitialized() then
+        DB:InitializeDatabase();
+    end
+
+    DB:ResetTable(GoldPlanner.db.settings.progressBar, DB:GetDefaults().settings.progressBar);
+end

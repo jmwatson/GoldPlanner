@@ -147,7 +147,7 @@ local function HandleEvents(self, event, ...)
             return;
         end
 
-        GoldPlanner:InitializeDatabase();
+        GoldPlanner.DB:InitializeDatabase();
         GoldPlanner.Data.History:CompactAllHistory();
         GoldPlanner.UI.Settings:Build();
         GoldPlanner.UI.Dashboard:Build();
