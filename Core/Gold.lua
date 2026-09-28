@@ -1,17 +1,22 @@
 local _, GoldPlanner = ...;
 
-function GoldPlanner:GetCharacterKey()
+GoldPlanner.Data = GoldPlanner.Data or {};
+
+local Gold = {};
+GoldPlanner.Data.Gold = Gold;
+
+local function GetCharacterKey()
     local name = UnitName("player");
     local realm = GetRealmName();
 
     return name .. "-" .. realm;
 end
 
-function GoldPlanner:GetCharacter()
-    local key = self:GetCharacterKey();
+function Gold:GetCharacter()
+    local key = GetCharacterKey();
 
-    if not self.db.characters[key] then
-        self.db.characters[key] = {
+    if not GoldPlanner.db.characters[key] then
+        GoldPlanner.db.characters[key] = {
             name = UnitName("player"),
             realm = GetRealmName(),
             copper = 0,
@@ -19,35 +24,35 @@ function GoldPlanner:GetCharacter()
         };
     end
 
-    return self.db.characters[key];
+    return GoldPlanner.db.characters[key];
 end
 
-function GoldPlanner:GetWarband()
-    return self.db.warband;
+function Gold:GetWarband()
+    return GoldPlanner.db.warband;
 end
 
-function GoldPlanner:GetTotalCopper()
-    local copperTotal = self.db.warband.copper;
+function Gold:GetTotalCopper()
+    local copperTotal = GoldPlanner.db.warband.copper;
 
-    for _, character in pairs(self.db.characters) do
+    for _, character in pairs(GoldPlanner.db.characters) do
         copperTotal = copperTotal + character.copper;
     end
 
     return copperTotal;
 end
 
-function GoldPlanner:UpdateCharacterCopper()
+function Gold:UpdateCharacterCopper()
     local character = self:GetCharacter();
 
     character.copper = GetMoney();
 
-    self:AddCharacterHistorySnapshot();
-    self:ScheduleTotalHistorySnapshot();
+    GoldPlanner:AddCharacterHistorySnapshot();
+    GoldPlanner:ScheduleTotalHistorySnapshot();
 end
 
-function GoldPlanner:UpdateWarbandCopper()
-    self.db.warband.copper = C_Bank.FetchDepositedMoney(Enum.BankType.Account);
+function Gold:UpdateWarbandCopper()
+    GoldPlanner.db.warband.copper = C_Bank.FetchDepositedMoney(Enum.BankType.Account);
 
-    self:AddWarbandHistorySnapshot();
-    self:ScheduleTotalHistorySnapshot();
+    GoldPlanner:AddWarbandHistorySnapshot();
+    GoldPlanner:ScheduleTotalHistorySnapshot();
 end

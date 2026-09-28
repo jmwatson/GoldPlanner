@@ -100,7 +100,7 @@ function GoldPlanner:GetCopperEarnedSince(timestamp)
     end
 
     local startCopper = self:GetCopperAt(history, timestamp)
-    return self:GetTotalCopper() - startCopper;
+    return self.Data.Gold:GetTotalCopper() - startCopper;
 end
 
 local function GetStartOfToday()
@@ -174,7 +174,7 @@ end
 
 function GoldPlanner:GetTimeToGoalDisplay()
     local goal = self:GetGoal();
-    local totalCopper = self:GetTotalCopper();
+    local totalCopper = self.Data.Gold:GetTotalCopper();
     local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
 
     if (goal <= 0) or (not statistics or statistics.rate <= 0) then

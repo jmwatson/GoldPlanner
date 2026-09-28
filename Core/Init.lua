@@ -137,6 +137,7 @@ local function HandleEvents(self, event, ...)
     local Overview = GoldPlanner.UI.Overview;
     local StatsBox = GoldPlanner.UI.StatsBox;
     local ProgressBar = GoldPlanner.UI.ProgressBar;
+    local Gold = GoldPlanner.Data.Gold;
 
     if event == EVENTS.ADDON_LOADED then
         local loadedAddonName = ...;
@@ -153,18 +154,18 @@ local function HandleEvents(self, event, ...)
         StatsBox:Build();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
-        GoldPlanner:UpdateCharacterCopper();
-        GoldPlanner:UpdateWarbandCopper();
+        Gold:UpdateCharacterCopper();
+        Gold:UpdateWarbandCopper();
         Overview:Update();
         ProgressBar:Update();
         StatsBox:Update();
     elseif event == EVENTS.PLAYER_MONEY then
-        GoldPlanner:UpdateCharacterCopper();
+        Gold:UpdateCharacterCopper();
         Overview:Update();
         ProgressBar:Update();
         StatsBox:Update();
     elseif event == EVENTS.ACCOUNT_MONEY then
-        GoldPlanner:UpdateWarbandCopper();
+        Gold:UpdateWarbandCopper();
         Overview:Update();
         ProgressBar:Update();
         StatsBox:Update();
