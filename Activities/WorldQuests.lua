@@ -1,5 +1,10 @@
 local _, GoldPlanner = ...;
 
+GoldPlanner.Activities = GoldPlanner.Activities or {};
+
+local WorldQuests = {};
+GoldPlanner.Activities.WorldQuests = WorldQuests;
+
 local function GetWorldQuestInfo(questID, mapID)
     local title = C_TaskQuest.GetQuestInfoByQuestID(questID);
     local x, y = C_TaskQuest.GetQuestLocation(questID, mapID);
@@ -49,40 +54,18 @@ local function CollectZoneMaps(mapID, seen, results)
     return results;
 end
 
-function GoldPlanner:PrintMapChain()
-    local mapID = C_Map.GetBestMapForUnit("player");
-
-    if not mapID then
-        self:Log("Could not determine current map.");
-        return;
-    end
-
-    self:Log("Map chain for current location:");
-
-    while mapID do
-        local info = C_Map.GetMapInfo(mapID);
-
-        if not info then
-            break;
-        end
-
-        self:Log(string.format("  %d: %s (mapType %d)", mapID, info.name, info.mapType));
-        mapID = info.parentMapID;
-    end
-end
-
-function GoldPlanner:GetCurrentExpansionMaps()
+local function GetCurrentExpansionMaps()
     local seen = {};
     local zoneMaps = {};
 
-    for _, continentMapID in ipairs(self.EXPANSION_CONTINENTS) do
+    for _, continentMapID in ipairs(GoldPlanner.EXPANSION_CONTINENTS) do
         CollectZoneMaps(continentMapID, seen, zoneMaps);
     end
 
     return zoneMaps;
 end
 
-function GoldPlanner:GetWorldQuestsOnMap(mapID)
+local function GetWorldQuestsOnMap(mapID)
     local questsOnMap = C_TaskQuest.GetQuestsOnMap(mapID) or {};
     local quests = {};
 
@@ -97,13 +80,35 @@ function GoldPlanner:GetWorldQuestsOnMap(mapID)
     return quests;
 end
 
-function GoldPlanner:DebugMapQuests(mapID)
+function WorldQuests:PrintMapChain()
+    local mapID = C_Map.GetBestMapForUnit("player");
+
+    if not mapID then
+        GoldPlanner:Log("Could not determine current map.");
+        return;
+    end
+
+    GoldPlanner:Log("Map chain for current location:");
+
+    while mapID do
+        local info = C_Map.GetMapInfo(mapID);
+
+        if not info then
+            break;
+        end
+
+        GoldPlanner:Log(string.format("  %d: %s (mapType %d)", mapID, info.name, info.mapType));
+        mapID = info.parentMapID;
+    end
+end
+
+function WorldQuests:DebugMapQuests(mapID)
     local raw = C_TaskQuest.GetQuestsOnMap(mapID) or {};
 
-    self:Log(string.format("Map %d: C_TaskQuest.GetQuestsOnMap returned %d entries", mapID, #raw));
+    GoldPlanner:Log(string.format("Map %d: C_TaskQuest.GetQuestsOnMap returned %d entries", mapID, #raw));
 
     for _, questInfo in ipairs(raw) do
-        self:Log("",
+        GoldPlanner:Log("",
             "questID", questInfo.questID,
             "tagType", tostring(questInfo.questTagType),
             "isWorldQuest", tostring(C_QuestLog.IsWorldQuest(questInfo.questID)),
@@ -112,88 +117,75 @@ function GoldPlanner:DebugMapQuests(mapID)
     end
 end
 
-function GoldPlanner:RequestWorldQuestRewardData(questID)
-    C_TaskQuest.RequestPreloadRewardData(questID);
+function WorldQuests:Get()
+    return GoldPlanner.Runtime.WorldQuests;
 end
 
-function GoldPlanner:GetWorldQuests()
-    return self.Runtime.WorldQuests;
+function WorldQuests:Clear()
+    wipe(GoldPlanner.Runtime.WorldQuests);
+    wipe(GoldPlanner.Runtime.PendingRewardData);
 end
 
-function GoldPlanner:ClearWorldQuests()
-    wipe(self.Runtime.WorldQuests);
-    wipe(self.Runtime.PendingRewardData);
-end
-
-function GoldPlanner:ScanWorldQuests(mapID)
-    local quests = self:GetWorldQuestsOnMap(mapID);
+function WorldQuests:Scan(mapID)
+    local quests = GetWorldQuestsOnMap(mapID);
 
     for _, quest in ipairs(quests) do
-        self.Runtime.WorldQuests[quest.questID] = quest;
-        self.Runtime.PendingRewardData[quest.questID] = true;
-        self:RequestWorldQuestRewardData(quest.questID);
+        GoldPlanner.Runtime.WorldQuests[quest.questID] = quest;
+        GoldPlanner.Runtime.PendingRewardData[quest.questID] = true;
+        C_TaskQuest.RequestPreloadRewardData(quest.questID);
     end
 
     return quests;
 end
 
-function GoldPlanner:ScanAllWorldQuests()
-    local zoneMaps = self:GetCurrentExpansionMaps();
+function WorldQuests:ScanAll()
+    local zoneMaps = GetCurrentExpansionMaps();
 
     if #zoneMaps == 0 then
-        self:Log("No expansion zones configured. Set GoldPlanner.EXPANSION_CONTINENTS in Constants.lua (use /gp maps to find the mapID).");
-        return self.Runtime.WorldQuests;
+        GoldPlanner:Log("No expansion zones configured. Set GoldPlanner.EXPANSION_CONTINENTS in Constants.lua (use /gp maps to find the mapID).");
+        return GoldPlanner.Runtime.WorldQuests;
     end
 
-    self:ClearWorldQuests();
+    self:Clear();
 
     local totalQuests = 0;
 
     for _, mapID in ipairs(zoneMaps) do
-        local quests = self:ScanWorldQuests(mapID);
+        local quests = self:Scan(mapID);
         totalQuests = totalQuests + #quests;
     end
 
-    self:Log(string.format("Scanned %d zones, found %d world quests.", #zoneMaps, totalQuests));
+    GoldPlanner:Log(string.format("Scanned %d zones, found %d world quests.", #zoneMaps, totalQuests));
 
-    return self.Runtime.WorldQuests;
+    return GoldPlanner.Runtime.WorldQuests;
 end
 
-function GoldPlanner:GetTotalWorldQuestGold()
+function WorldQuests:GetTotalGold()
     local total = 0;
 
-    for _, quest in pairs(self.Runtime.WorldQuests) do
+    for _, quest in pairs(GoldPlanner.Runtime.WorldQuests) do
         total = total + (quest.gold or 0);
     end
 
     return total;
 end
 
-function GoldPlanner:GetPendingRewardCount()
-    local count = 0;
-
-    for _ in pairs(self.Runtime.PendingRewardData) do
-        count = count + 1;
-    end
-
-    return count;
-end
-
-function GoldPlanner:TrackWorldQuest(questID)
+function WorldQuests:Track(questID)
     C_QuestLog.AddWorldQuestWatch(questID);
     C_SuperTrack.SetSuperTrackedQuestID(questID);
 end
 
-function GoldPlanner:UntrackWorldQuest(questID)
+-- Not needed yet, but leaving in on the off chance we want this functionality later
+function WorldQuests:Untrack(questID)
     C_QuestLog.RemoveWorldQuestWatch(questID);
 end
 
-function GoldPlanner:HandleWorldQuestRewardData(questID)
+function WorldQuests:HandleRewardData(questID)
     if not HaveQuestRewardData(questID) then
         return false;
     end
 
-    local quest = self.Runtime.WorldQuests[questID];
+    local quest = GoldPlanner.Runtime.WorldQuests[questID];
 
     if not quest then
         return false;

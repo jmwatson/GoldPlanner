@@ -8,6 +8,8 @@ GoldPlanner.UI.WorldQuests = WorldQuests
 local ROW_HEIGHT = 18;
 
 local function CreateQuestRow(parent)
+    local WQ = GoldPlanner.Activities.WorldQuests;
+
     local row = CreateFrame("Button", nil, parent);
     row:SetHeight(ROW_HEIGHT);
 
@@ -28,7 +30,7 @@ local function CreateQuestRow(parent)
 
     row:SetScript("OnClick", function(self)
         if self.questID then
-            GoldPlanner:TrackWorldQuest(self.questID);
+            WQ:Track(self.questID);
         end
     end);
 
@@ -99,6 +101,8 @@ function WorldQuests:Update()
         return;
     end
 
+    local WQ = GoldPlanner.Activities.WorldQuests;
+
     local scrollChild = self.scrollChild;
     local rows = self.rows;
     local quests = {};
@@ -113,7 +117,7 @@ function WorldQuests:Update()
         return a.gold > b.gold;
     end);
 
-    self.totalText:SetText("Total Gold Available: " .. GetMoneyString(GoldPlanner:GetTotalWorldQuestGold(), true));
+    self.totalText:SetText("Total Gold Available: " .. GetMoneyString(WQ:GetTotalGold(), true));
 
     for index, quest in ipairs(quests) do
         local row = rows[index];
