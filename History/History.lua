@@ -1,4 +1,10 @@
 local _, GoldPlanner = ...;
+
+GoldPlanner.Data = GoldPlanner.Data or {};
+
+local History = {};
+GoldPlanner.Data.History = History;
+
 local tinsert = table.insert;
 local totalHistoryPending = false;
 
@@ -70,20 +76,20 @@ local function CompactHistory(history, now)
     return compacted;
 end
 
-function GoldPlanner:AddCharacterHistorySnapshot()
-    local character = self.Data.Gold:GetCharacter();
+function History:AddCharacterSnapshot()
+    local character = GoldPlanner.Data.Gold:GetCharacter();
     AddHistorySnapshot(character.history, character.copper);
 end
 
-function GoldPlanner:AddWarbandHistorySnapshot()
-    AddHistorySnapshot(self.db.warband.history, self.db.warband.copper);
+function History:AddWarbandSnapshot()
+    AddHistorySnapshot(GoldPlanner.db.warband.history, GoldPlanner.db.warband.copper);
 end
 
-function GoldPlanner:AddTotalHistorySnapshot()
-    AddHistorySnapshot(self.db.totalHistory, self.Data.Gold:GetTotalCopper());
+function History:AddTotalSnapshot()
+    AddHistorySnapshot(GoldPlanner.db.totalHistory, GoldPlanner.Data.Gold:GetTotalCopper());
 end
 
-function GoldPlanner:ScheduleTotalHistorySnapshot()
+function History:ScheduleTotalSnapshot()
     if totalHistoryPending then
         return;
     end
@@ -93,25 +99,26 @@ function GoldPlanner:ScheduleTotalHistorySnapshot()
     -- This happens at the end of the current frame to avoid multiple snapshots being added in the same frame
     C_Timer.After(0, function()
         totalHistoryPending = false;
-        self:AddTotalHistorySnapshot();
+        self:AddTotalSnapshot();
     end);
 end
 
-function GoldPlanner:CompactAllHistory()
+function History:CompactAllHistory()
     local now = time();
-    local lastCompaction = self.db.lastCompaction;
+    local db = GoldPlanner.db;
+    local lastCompaction = db.lastCompaction;
 
     if lastCompaction and (now - lastCompaction) < DAY then
         return;
     end
 
-    for _, character in pairs(self.db.characters) do
+    for _, character in pairs(db.characters) do
         character.history = CompactHistory(character.history, now);
     end
 
-    self.db.warband.history = CompactHistory(self.db.warband.history, now);
-    self.db.totalHistory = CompactHistory(self.db.totalHistory, now);
-    self.db.lastCompaction = now;
+    db.warband.history = CompactHistory(db.warband.history, now);
+    db.totalHistory = CompactHistory(db.totalHistory, now);
+    db.lastCompaction = now;
 
     GoldPlanner:Log("History compaction complete.")
 end
