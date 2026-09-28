@@ -46,13 +46,13 @@ function Gold:UpdateCharacterCopper()
 
     character.copper = GetMoney();
 
-    GoldPlanner:AddCharacterHistorySnapshot();
-    GoldPlanner:ScheduleTotalHistorySnapshot();
+    GoldPlanner.Data.History:AddCharacterSnapshot();
+    GoldPlanner.Data.History:ScheduleTotalSnapshot();
 end
 
 function Gold:UpdateWarbandCopper()
     GoldPlanner.db.warband.copper = C_Bank.FetchDepositedMoney(Enum.BankType.Account);
 
-    GoldPlanner:AddWarbandHistorySnapshot();
-    GoldPlanner:ScheduleTotalHistorySnapshot();
+    GoldPlanner.Data.History:AddWarbandSnapshot();
+    GoldPlanner.Data.History:ScheduleTotalSnapshot();
 end
