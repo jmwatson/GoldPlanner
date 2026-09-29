@@ -61,7 +61,7 @@ function WorldQuests:Build(parent)
     refreshButton:SetText("Refresh");
     refreshButton:SetPoint("TOPRIGHT", 0, 4);
     refreshButton:SetScript("OnClick", function()
-        GoldPlanner:RefreshWorldQuestGold();
+        self:RefreshWorldQuestGold();
     end);
 
     local totalText = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
@@ -146,4 +146,9 @@ function WorldQuests:Update()
 
     scrollChild:SetWidth(math.max(1, self.scrollFrame:GetWidth()));
     scrollChild:SetHeight(math.max(1, #quests * ROW_HEIGHT));
+end
+
+function WorldQuests:RefreshWorldQuestGold()
+    GoldPlanner.Activities.WorldQuests:ScanAll();
+    self:Update();
 end

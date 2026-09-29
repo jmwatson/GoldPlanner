@@ -77,14 +77,11 @@ local function ScheduleWorldQuestPanelUpdate()
     end);
 end
 
-function GoldPlanner:RefreshWorldQuestGold()
-    GoldPlanner.Activities.WorldQuests:ScanAll();
-    GoldPlanner.UI.WorldQuests:Update();
-end
-
 local function HandleSlashCommand(parameters)
     local command, value = parameters:match("^(%S+)%s*(.*)$");
     local usage = "Usage: /gp goal <gold amount> [days]";
+
+    local Dashboard = GoldPlanner.UI.Dashboard;
 
     if command == "goal" then
         local amount, days = value:match("^(%S+)%s*(%S*)$");
@@ -113,7 +110,8 @@ local function HandleSlashCommand(parameters)
     elseif command == "maps" then
         GoldPlanner:PrintMapChain();
     elseif command == "wq" then
-        GoldPlanner:RefreshWorldQuestGold();
+        -- GoldPlanner.UI.WorldQuests:RefreshWorldQuestGold();
+        Dashboard:ShowWQ();
     elseif command == "wqdebug" then
         local mapID = tonumber(value);
 
@@ -122,8 +120,10 @@ local function HandleSlashCommand(parameters)
         end
 
         GoldPlanner:DebugMapQuests(mapID);
+    elseif command == "overview" then
+        Dashboard:ShowOverview();
     else
-        GoldPlanner.UI.Dashboard:Toggle();
+        Dashboard:Toggle();
     end
 end
 
