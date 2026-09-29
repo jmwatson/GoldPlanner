@@ -5,6 +5,8 @@ GoldPlanner.Data = GoldPlanner.Data or {};
 local Statistics = {};
 GoldPlanner.Data.Statistics = Statistics;
 
+local trim = GoldPlanner.Utils.TrimGold;
+
 local DAY = 86400;
 local HOUR = 3600;
 local MINUTE = 60;
@@ -134,7 +136,6 @@ function Statistics:GetDailyGoalProgress()
 end
 
 function Statistics:GetDailyGoalDisplay()
-    local trim = GoldPlanner.TrimGold;
     local daily = self:GetDailyGoalProgress();
 
     if not daily then

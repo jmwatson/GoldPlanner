@@ -5,6 +5,8 @@ GoldPlanner.Activities = GoldPlanner.Activities or {};
 local WorldQuests = {};
 GoldPlanner.Activities.WorldQuests = WorldQuests;
 
+local Log = GoldPlanner.Utils.Log;
+
 local PendingRewardData = {};
 local WQs = {};
 
@@ -87,11 +89,11 @@ function WorldQuests:PrintMapChain()
     local mapID = C_Map.GetBestMapForUnit("player");
 
     if not mapID then
-        GoldPlanner:Log("Could not determine current map.");
+        Log("Could not determine current map.");
         return;
     end
 
-    GoldPlanner:Log("Map chain for current location:");
+    Log("Map chain for current location:");
 
     while mapID do
         local info = C_Map.GetMapInfo(mapID);
@@ -100,7 +102,7 @@ function WorldQuests:PrintMapChain()
             break;
         end
 
-        GoldPlanner:Log(string.format("  %d: %s (mapType %d)", mapID, info.name, info.mapType));
+        Log(string.format("  %d: %s (mapType %d)", mapID, info.name, info.mapType));
         mapID = info.parentMapID;
     end
 end
@@ -108,10 +110,10 @@ end
 function WorldQuests:DebugMapQuests(mapID)
     local raw = C_TaskQuest.GetQuestsOnMap(mapID) or {};
 
-    GoldPlanner:Log(string.format("Map %d: C_TaskQuest.GetQuestsOnMap returned %d entries", mapID, #raw));
+    Log(string.format("Map %d: C_TaskQuest.GetQuestsOnMap returned %d entries", mapID, #raw));
 
     for _, questInfo in ipairs(raw) do
-        GoldPlanner:Log("",
+        Log("",
             "questID", questInfo.questID,
             "tagType", tostring(questInfo.questTagType),
             "isWorldQuest", tostring(C_QuestLog.IsWorldQuest(questInfo.questID)),
@@ -149,7 +151,7 @@ function WorldQuests:ScanAll()
     local zoneMaps = GetCurrentExpansionMaps();
 
     if #zoneMaps == 0 then
-        GoldPlanner:Log("No expansion zones configured. Set GoldPlanner.EXPANSION_CONTINENTS in Constants.lua (use /gp maps to find the mapID).");
+        Log("No expansion zones configured. Set GoldPlanner.EXPANSION_CONTINENTS in Constants.lua (use /gp maps to find the mapID).");
         return WQs;
     end
 
@@ -162,7 +164,7 @@ function WorldQuests:ScanAll()
         totalQuests = totalQuests + #quests;
     end
 
-    GoldPlanner:Log(string.format("Scanned %d zones, found %d world quests.", #zoneMaps, totalQuests));
+    Log(string.format("Scanned %d zones, found %d world quests.", #zoneMaps, totalQuests));
 
     return WQs;
 end

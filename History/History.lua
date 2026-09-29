@@ -124,5 +124,5 @@ function History:CompactAllHistory()
     db.totalHistory = CompactHistory(db.totalHistory, now);
     db.lastCompaction = now;
 
-    GoldPlanner:Log("History compaction complete.")
+    GoldPlanner.Utils:Log("History compaction complete.")
 end

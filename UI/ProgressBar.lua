@@ -1,12 +1,11 @@
 local _, GoldPlanner = ...;
 
-local trim = GoldPlanner.TrimGold;
-
-local ProgressBar = {};
-
 GoldPlanner.UI = GoldPlanner.UI or {};
 
+local ProgressBar = {};
 GoldPlanner.UI.ProgressBar = ProgressBar;
+
+local trim = GoldPlanner.Utils.TrimGold;
 
 function ProgressBar:Build()
     if self.progressBar then
