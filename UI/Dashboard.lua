@@ -68,8 +68,8 @@ function Dashboard:Build()
     navMenu:AddItem("World Quests", worldQuestPanel, function()
         WQ:Update();
 
-        if not GoldPlanner.Runtime.HasScannedWorldQuests then
-            GoldPlanner.Runtime.HasScannedWorldQuests = true;
+        if not HasScannedWorldQuests then
+            HasScannedWorldQuests = true;
             WQ:RefreshWorldQuestGold();
         end
     end);
