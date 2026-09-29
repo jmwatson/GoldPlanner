@@ -172,7 +172,7 @@ local function HandleEvents(self, event, ...)
         StatsBox:Update();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
         local WQ = GoldPlanner.Activities.WorldQuests;
-        local pending = GoldPlanner.Runtime.PendingRewardData;
+        local pending = WQ.GetPending();
         local resolvedAny = false;
 
         for questID in pairs(pending) do

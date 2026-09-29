@@ -5,6 +5,9 @@ GoldPlanner.Activities = GoldPlanner.Activities or {};
 local WorldQuests = {};
 GoldPlanner.Activities.WorldQuests = WorldQuests;
 
+local PendingRewardData = {};
+local WQs = {};
+
 local function GetWorldQuestInfo(questID, mapID)
     local title = C_TaskQuest.GetQuestInfoByQuestID(questID);
     local x, y = C_TaskQuest.GetQuestLocation(questID, mapID);
@@ -118,20 +121,24 @@ function WorldQuests:DebugMapQuests(mapID)
 end
 
 function WorldQuests:Get()
-    return GoldPlanner.Runtime.WorldQuests;
+    return WQs;
+end
+
+function WorldQuests:GetPending()
+    return PendingRewardData;
 end
 
 function WorldQuests:Clear()
-    wipe(GoldPlanner.Runtime.WorldQuests);
-    wipe(GoldPlanner.Runtime.PendingRewardData);
+    wipe(WQs);
+    wipe(PendingRewardData);
 end
 
 function WorldQuests:Scan(mapID)
     local quests = GetWorldQuestsOnMap(mapID);
 
     for _, quest in ipairs(quests) do
-        GoldPlanner.Runtime.WorldQuests[quest.questID] = quest;
-        GoldPlanner.Runtime.PendingRewardData[quest.questID] = true;
+        WQs[quest.questID] = quest;
+        PendingRewardData[quest.questID] = true;
         C_TaskQuest.RequestPreloadRewardData(quest.questID);
     end
 
@@ -143,7 +150,7 @@ function WorldQuests:ScanAll()
 
     if #zoneMaps == 0 then
         GoldPlanner:Log("No expansion zones configured. Set GoldPlanner.EXPANSION_CONTINENTS in Constants.lua (use /gp maps to find the mapID).");
-        return GoldPlanner.Runtime.WorldQuests;
+        return WQs;
     end
 
     self:Clear();
@@ -157,13 +164,13 @@ function WorldQuests:ScanAll()
 
     GoldPlanner:Log(string.format("Scanned %d zones, found %d world quests.", #zoneMaps, totalQuests));
 
-    return GoldPlanner.Runtime.WorldQuests;
+    return WQs;
 end
 
 function WorldQuests:GetTotalGold()
     local total = 0;
 
-    for _, quest in pairs(GoldPlanner.Runtime.WorldQuests) do
+    for _, quest in pairs(WQs) do
         total = total + (quest.gold or 0);
     end
 
@@ -185,7 +192,7 @@ function WorldQuests:HandleRewardData(questID)
         return false;
     end
 
-    local quest = GoldPlanner.Runtime.WorldQuests[questID];
+    local quest = WQs[questID];
 
     if not quest then
         return false;
