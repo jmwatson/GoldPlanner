@@ -1,12 +1,11 @@
 local _, GoldPlanner = ...;
 
-local trim = GoldPlanner.TrimGold;
-
-local ProgressBar = {};
-
 GoldPlanner.UI = GoldPlanner.UI or {};
 
+local ProgressBar = {};
 GoldPlanner.UI.ProgressBar = ProgressBar;
+
+local trim = GoldPlanner.Utils.TrimGold;
 
 function ProgressBar:Build()
     if self.progressBar then
@@ -153,4 +152,14 @@ function ProgressBar:SavePosition()
         settings.x = x;
         settings.y = y;
     end
+end
+
+function ProgressBar:ResetProgressBar()
+    local DB = GoldPlanner.DB;
+
+    if not DB:IsInitialized() then
+        DB:InitializeDatabase();
+    end
+
+    DB:ResetTable(GoldPlanner.db.settings.progressBar, DB:GetDefaults().settings.progressBar);
 end

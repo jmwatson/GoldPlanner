@@ -28,6 +28,8 @@ function Dashboard:Build()
         return;
     end
 
+    local WQ = GoldPlanner.UI.WorldQuests;
+
     local dashboard = CreateFrame("Frame", "GoldPlannerDashboard", UIParent, "BasicFrameTemplate");
     tinsert(UISpecialFrames, "GoldPlannerDashboard");
 
@@ -64,16 +66,16 @@ function Dashboard:Build()
 
     navMenu:AddItem("Overview", overviewPanel);
     navMenu:AddItem("World Quests", worldQuestPanel, function()
-        GoldPlanner.UI.WorldQuests:Update();
+        WQ:Update();
 
-        if not GoldPlanner.Runtime.HasScannedWorldQuests then
-            GoldPlanner.Runtime.HasScannedWorldQuests = true;
-            GoldPlanner:RefreshWorldQuestGold();
+        if not HasScannedWorldQuests then
+            HasScannedWorldQuests = true;
+            WQ:RefreshWorldQuestGold();
         end
     end);
 
     GoldPlanner.UI.Overview:Build(overviewPanel.content);
-    GoldPlanner.UI.WorldQuests:Build(worldQuestPanel.content);
+    WQ:Build(worldQuestPanel.content);
 
     dashboard.navMenu = navMenu;
     dashboard.overviewPanel = overviewPanel;
@@ -89,6 +91,24 @@ function Dashboard:Toggle()
         self.dashboard:Hide();
     else
         GoldPlanner.UI.Overview:Update();
+        self.dashboard:Show();
+    end
+end
+
+function Dashboard:ShowWQ()
+    if self.dashboard:IsShown() then
+        self.dashboard.navMenu:SelectItem(2);
+    else
+        self.dashboard.navMenu:SelectItem(2);
+        self.dashboard:Show();
+    end
+end
+
+function Dashboard:ShowOverview()
+    if self.dashboard:IsShown() then
+        self.dashboard.navMenu:SelectItem(1);
+    else
+        self.dashboard.navMenu:SelectItem(1);
         self.dashboard:Show();
     end
 end

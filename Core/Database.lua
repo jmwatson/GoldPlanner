@@ -1,5 +1,10 @@
 local _, GoldPlanner = ...;
 
+-- GoldPlanner.Core = GoldPlanner.Core or {};
+
+local DB = {};
+GoldPlanner.DB = DB;
+
 local DEFAULT_DATABASE = {
     version = 1,
     lastCompaction = nil;
@@ -37,51 +42,47 @@ local DEFAULT_DATABASE = {
     },
 };
 
-local function CopyDefaults(source, target)
+function DB:CopyDefaults(source, target)
     for key, value in pairs(source) do
         if target[key] == nil then
             if type(value) == "table" then
                 target[key] = {};
-                CopyDefaults(value, target[key]);
+                self:CopyDefaults(value, target[key]);
             else
                 target[key] = value;
             end
         elseif type(value) == "table" and type(target[key]) == "table" then
-            CopyDefaults(value, target[key]);
+            self:CopyDefaults(value, target[key]);
         end
     end
 end
 
-local function ResetTable(target, defaults)
+function DB:ResetTable(target, defaults)
     for key in pairs(target) do
         target[key] = nil;
     end
 
-    CopyDefaults(defaults, target);
+    self:CopyDefaults(defaults, target);
 end
 
-function GoldPlanner:InitializeDatabase()
+function DB:InitializeDatabase()
     if not GoldPlannerDB then
         GoldPlannerDB = {};
     end
 
-    CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
+    self:CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
 
-    self.db = GoldPlannerDB;
+    GoldPlanner.db = GoldPlannerDB;
 end
 
-function GoldPlanner:ResetProgressBar()
-    if not GoldPlannerDB then
-        self:InitializeDatabase();
-    end
-
-    ResetTable(self.db.settings.progressBar, DEFAULT_DATABASE.settings.progressBar);
+function DB:GetDefaults()
+    return DEFAULT_DATABASE;
 end
 
-function GoldPlanner:ResetStatsBoxSettings()
+function DB:IsInitialized()
     if not GoldPlannerDB then
-        self:InitializeDatabase();
+        return false;
     end
 
-    ResetTable(self.db.settings.statsBox, DEFAULT_DATABASE.settings.statsBox);
+    return true;
 end

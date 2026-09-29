@@ -11,7 +11,6 @@ Core/Constants.lua
 Core/Utils.lua
 Core/Init.lua
 Core/Database.lua
-Core/RuntimeData.lua
 Core/Gold.lua
 
 History/History.lua

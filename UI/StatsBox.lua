@@ -3,8 +3,9 @@ local _, GoldPlanner = ...;
 GoldPlanner.UI = GoldPlanner.UI or {};
 
 local StatsBox = {};
-
 GoldPlanner.UI.StatsBox = StatsBox;
+
+local trim = GoldPlanner.Utils.TrimGold;
 
 function StatsBox:Build(parent)
     if self.statsBox then
@@ -75,7 +76,7 @@ function StatsBox:Update()
             sformat("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
     end
 
-    local rateDisplay = Stats:GetMoneyRateDisplay(GP.TrimGold);
+    local rateDisplay = Stats:GetMoneyRateDisplay(trim);
     frame.rate:SetText(rateDisplay and
         sformat("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
         sformat("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
@@ -135,4 +136,14 @@ function StatsBox:SavePosition()
         settings.x = x;
         settings.y = y;
     end
+end
+
+function GoldPlanner:ResetStatsBoxSettings()
+    local DB = GoldPlanner.DB;
+
+    if not DB:IsInitialized() then
+        DB:InitializeDatabase();
+    end
+
+    DB:ResetTable(self.db.settings.statsBox, DB:GetDefaults().settings.statsBox);
 end
