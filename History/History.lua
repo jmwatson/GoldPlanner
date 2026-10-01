@@ -76,24 +76,11 @@ local function CompactHistory(history, now)
     return compacted;
 end
 
-function History:AddCharacterSnapshot()
-    local character = GoldPlanner.Data.Gold:GetCharacter();
-    AddHistorySnapshot(character.history, character.copper);
-end
-
-function History:AddWarbandSnapshot()
-    AddHistorySnapshot(GoldPlanner.db.warband.history, GoldPlanner.db.warband.copper);
-end
-
-function History:AddTotalSnapshot()
+local function AddTotalSnapshot()
     AddHistorySnapshot(GoldPlanner.db.totalHistory, GoldPlanner.Data.Gold:GetTotalCopper());
 end
 
-function History:GetTotal()
-    return GoldPlanner.db.totalHistory;
-end
-
-function History:ScheduleTotalSnapshot()
+local function ScheduleTotalSnapshot()
     if totalHistoryPending then
         return;
     end
@@ -103,8 +90,23 @@ function History:ScheduleTotalSnapshot()
     -- This happens at the end of the current frame to avoid multiple snapshots being added in the same frame
     C_Timer.After(0, function()
         totalHistoryPending = false;
-        self:AddTotalSnapshot();
+        AddTotalSnapshot();
     end);
+end
+
+function History:AddCharacterSnapshot()
+    local character = GoldPlanner.Data.Gold:GetCharacter();
+    AddHistorySnapshot(character.history, character.copper);
+    ScheduleTotalSnapshot();
+end
+
+function History:AddWarbandSnapshot()
+    AddHistorySnapshot(GoldPlanner.db.warband.history, GoldPlanner.db.warband.copper);
+    ScheduleTotalSnapshot();
+end
+
+function History:GetTotal()
+    return GoldPlanner.db.totalHistory;
 end
 
 function History:CompactAllHistory()
