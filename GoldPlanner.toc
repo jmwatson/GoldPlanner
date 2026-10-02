@@ -11,6 +11,7 @@ Core/Constants.lua
 Core/Utils.lua
 Core/Init.lua
 Core/Database.lua
+Core/Account.lua
 Core/Gold.lua
 
 History/History.lua
@@ -24,6 +25,7 @@ UI/Settings.lua
 UI/NavMenu.lua
 UI/Overview.lua
 UI/WorldQuests.lua
+UI/Format.lua
 UI/Dashboard.lua
 UI/ProgressBar.lua
 UI/StatsBox.lua

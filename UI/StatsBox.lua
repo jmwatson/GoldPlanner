@@ -58,28 +58,19 @@ function StatsBox:Update()
 
     local GP = GoldPlanner;
     local Stats = GP.Data.Statistics;
-    local sformat = string.format;
+    local Goal = GP.Data.Goal;
+    local Format = GP.UI.Format;
     local frame = self.statsBox;
     local goal = GP.Data.Goal:Get();
+    local total = GP.Data.Gold:GetTotalCopper();
 
-    if goal <= 0 then
-        frame.timeToGoal:SetText(sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
-    else
-        local timeToGoal = Stats:GetTimeToGoalDisplay();
-        frame.timeToGoal:SetText(timeToGoal and
-            sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, timeToGoal) or
-            sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
+    frame.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
 
-        local dailyGoalDisplay = Stats:GetDailyGoalDisplay();
-        frame.dailyGoal:SetText(dailyGoalDisplay and
-            sformat("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
-            sformat("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
+    if goal > 0 then
+        frame.dailyGoal:SetText(Format.DailyGoal(Stats:GetDailyGoalProgress(Goal:GetDaily(), total)));
     end
 
-    local rateDisplay = Stats:GetMoneyRateDisplay(trim);
-    frame.rate:SetText(rateDisplay and
-        sformat("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
-        sformat("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
+    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), trim));
 
     local width = math.max(frame.rate:GetStringWidth(), frame.timeToGoal:GetStringWidth(), frame.dailyGoal:GetStringWidth());
     local height = frame.rate:GetStringHeight() + frame.timeToGoal:GetStringHeight() + frame.dailyGoal:GetStringHeight();

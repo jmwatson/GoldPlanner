@@ -98,10 +98,13 @@ function Overview:Update()
     local Gold = GP.Data.Gold;
     local Goal = GP.Data.Goal;
     local Stats = GP.Data.Statistics;
+    local Format = GP.UI.Format;
 
-    self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacter().copper, true));
-    self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarband().copper, true));
-    self.totalGold:SetText("Total: " .. GetMoneyString(Gold:GetTotalCopper(), true));
+    local total = Gold:GetTotalCopper();
+
+    self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacter(), true));
+    self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarband(), true));
+    self.totalGold:SetText("Total: " .. GetMoneyString(total, true));
 
     local goal = Goal:Get();
 
@@ -110,26 +113,15 @@ function Overview:Update()
         self.remaining:SetText(GP.STRINGS.EMPTY_STRING);
         self.progress.bar:SetValue(0);
         self.progress.bar.text:SetText(GP.STRINGS.EMPTY_STRING);
-        self.timeToGoal:SetText(string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
     else
-        local timeToGoal = Stats:GetTimeToGoalDisplay();
         local goalProgress = Goal:GetProgress();
         self.goal:SetText(string.format("%s: %s", GP.STRINGS.GOAL, GetMoneyString(goal, true)));
         self.remaining:SetText(string.format("%s: %s", GP.STRINGS.REMAINING, GetMoneyString(Goal:GetRemaining(), true)));
         self.progress.bar:SetValue(goalProgress);
         self.progress.bar.text:SetText(string.format("%.1f%%", goalProgress * 100));
-        self.timeToGoal:SetText(timeToGoal and
-            string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, timeToGoal) or
-            string.format("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
     end
 
-    local rateDisplay = Stats:GetMoneyRateDisplay();
-    self.rate:SetText(rateDisplay and
-        string.format("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
-        string.format("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
-
-    local dailyGoalDisplay = Stats:GetDailyGoalDisplay();
-    self.dailyGoal:SetText(dailyGoalDisplay and
-        string.format("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
-        string.format("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
+    self.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
+    self.rate:SetText(Format.Rate(Stats:GetHourlyRate(), false));
+    self.dailyGoal:SetText(Format.DailyGoal(Stats:GetDailyGoalProgress(Goal:GetDaily(), total)));
 end
