@@ -192,7 +192,7 @@ local function HandleEvents(self, event, ...)
         RefreshUI();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
         local WQ = GoldPlanner.Activities.WorldQuests;
-        local pending = WQ.GetPending();
+        local pending = WQ:GetPending();
         local resolvedAny = false;
 
         for questID in pairs(pending) do
