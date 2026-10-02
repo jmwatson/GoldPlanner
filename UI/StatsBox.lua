@@ -64,13 +64,12 @@ function StatsBox:Update()
     local goal = GP.Data.Goal:Get();
     local total = GP.Data.Gold:GetTotalCopper();
 
+    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), trim));
     frame.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
 
     if goal > 0 then
         frame.dailyGoal:SetText(Format.DailyGoal(Stats:GetDailyGoalProgress(Goal:GetDaily(), total)));
     end
-
-    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), trim));
 
     local width = math.max(frame.rate:GetStringWidth(), frame.timeToGoal:GetStringWidth(), frame.dailyGoal:GetStringWidth());
     local height = frame.rate:GetStringHeight() + frame.timeToGoal:GetStringHeight() + frame.dailyGoal:GetStringHeight();
