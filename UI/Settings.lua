@@ -267,10 +267,7 @@ local function BuildStatsPadding(addonName, category, settings)
     Settings.CreateSlider(category, paddingSetting, options, description);
 
     paddingSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner.UI.StatsBox:SetPadding(
-            settings.padding,
-            value
-        );
+        GoldPlanner.UI.StatsBox:SetPadding(value);
     end);
 
     return paddingSetting;
