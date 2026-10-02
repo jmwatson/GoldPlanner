@@ -75,10 +75,11 @@ function History:Record(history, copper)
 
     -- Don't record enteries if nothing has changed
     if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
-        return;
+        return false;
     end
 
     tinsert(history, snapshot);
+    return true;
 end
 
 function History:SetTotalSource(provider)
@@ -95,7 +96,11 @@ function History:RequestTotalSnapshot()
     -- This happens at the end of the current frame to avoid multiple snapshots being added in the same frame
     C_Timer.After(0, function()
         totalHistoryPending = false;
-        self:Record(GoldPlanner.db.totalHistory, totalSource());
+        local recorded = self:Record(GoldPlanner.db.totalHistory, totalSource());
+        
+        if recorded then
+            EventRegistry:TriggerEvent(GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED);
+        end
     end);
 end
 

@@ -48,6 +48,8 @@ function StatsBox:Build(parent)
 
     self.statsBox = frame;
 
+    self:RegisterEvents();
+
     self:Update();
 end
 
@@ -136,4 +138,12 @@ function StatsBox:ResetStatsBoxSettings()
     end
 
     DB:ResetTable(GoldPlanner.db.settings.statsBox, DB:GetDefaults().settings.statsBox);
+end
+
+function StatsBox:RegisterEvents()
+    EventRegistry:RegisterCallback(
+        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        self.Update,
+        self
+    );
 end

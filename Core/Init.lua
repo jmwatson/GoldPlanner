@@ -136,12 +136,6 @@ local function RegisterSlashCommands()
     SlashCmdList["GOLDPLANNER"] = HandleSlashCommand;
 end
 
-local function RefreshUI()
-    GoldPlanner.UI.Overview:Update();
-    GoldPlanner.UI.ProgressBar:Update();
-    GoldPlanner.UI.StatsBox:Update();
-end
-
 local function RecordCharacterGold()
     local copper = GoldPlanner.Data.Gold:UpdateCharacterCopper();
     GoldPlanner.Data.History:Record(GoldPlanner.Data.Account:GetCharacter().history, copper);
@@ -183,13 +177,10 @@ local function HandleEvents(self, event, ...)
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         RecordCharacterGold();
         RecordWarbandGold();
-        RefreshUI();
     elseif event == EVENTS.PLAYER_MONEY then
         RecordCharacterGold();
-        RefreshUI();
     elseif event == EVENTS.ACCOUNT_MONEY then
         RecordWarbandGold();
-        RefreshUI();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
         local WQ = GoldPlanner.Activities.WorldQuests;
         local pending = WQ:GetPending();

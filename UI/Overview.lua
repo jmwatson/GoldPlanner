@@ -86,6 +86,8 @@ function Overview:Build(parent)
     self.timeToGoal = timeToGoal;
     self.dailyGoal = dailyGoal;
 
+    self:RegisterEvents();
+
     self.built = true;
 end
 
@@ -124,4 +126,12 @@ function Overview:Update()
     self.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
     self.rate:SetText(Format.Rate(Stats:GetHourlyRate(), false));
     self.dailyGoal:SetText(Format.DailyGoal(Stats:GetDailyGoalProgress(Goal:GetDaily(), total)));
+end
+
+function Overview:RegisterEvents()
+    EventRegistry:RegisterCallback(
+        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        self.Update,
+        self
+    );
 end
