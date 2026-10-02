@@ -24,18 +24,6 @@ local COMPACTION_WINDOWS = {
     { age = math.huge, bucket = WEEK },
 };
 
-local function AddHistorySnapshot(history, copper)
-    local lastSnapshot = history[#history];
-    local snapshot = { time(), copper };
-
-    -- Don't record enteries if nothing has changed
-    if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
-        return;
-    end
-
-    tinsert(history, snapshot);
-end
-
 local function CompactHistory(history, now)
     if #history < 30 then
         return history;
@@ -82,7 +70,15 @@ local function CompactHistory(history, now)
 end
 
 function History:Record(history, copper)
-    AddHistorySnapshot(history, copper);
+    local lastSnapshot = history[#history];
+    local snapshot = { time(), copper };
+
+    -- Don't record enteries if nothing has changed
+    if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
+        return;
+    end
+
+    tinsert(history, snapshot);
 end
 
 function History:SetTotalSource(provider)
@@ -99,7 +95,7 @@ function History:RequestTotalSnapshot()
     -- This happens at the end of the current frame to avoid multiple snapshots being added in the same frame
     C_Timer.After(0, function()
         totalHistoryPending = false;
-        AddHistorySnapshot(GoldPlanner.db.totalHistory, totalSource());
+        self:Record(GoldPlanner.db.totalHistory, totalSource());
     end);
 end
 
