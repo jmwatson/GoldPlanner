@@ -129,12 +129,12 @@ function StatsBox:SavePosition()
     end
 end
 
-function GoldPlanner:ResetStatsBoxSettings()
+function StatsBox:ResetStatsBoxSettings()
     local DB = GoldPlanner.DB;
 
     if not DB:IsInitialized() then
         DB:InitializeDatabase();
     end
 
-    DB:ResetTable(self.db.settings.statsBox, DB:GetDefaults().settings.statsBox);
+    DB:ResetTable(GoldPlanner.db.settings.statsBox, DB:GetDefaults().settings.statsBox);
 end
