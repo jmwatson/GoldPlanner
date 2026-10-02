@@ -303,7 +303,7 @@ function _Settings:Build()
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
-        GoldPlanner:ResetProgressBar();
+        GoldPlanner.UI.ProgressBar:ResetProgressBar();
         GoldPlanner.UI.ProgressBar:ApplySettings();
 
         local settings = GoldPlanner.db.settings.progressBar;
@@ -313,7 +313,7 @@ function _Settings:Build()
         heightProgressBarSetting:SetValue(settings.height);
     end);
     local resetStatsBoxButton = CreateResetButton(panel, resetProgressBarButton, "Reset Stats Box", function()
-        GoldPlanner:ResetStatsBoxSettings();
+        GoldPlanner.UI.StatsBox:ResetStatsBoxSettings();
         GoldPlanner.UI.StatsBox:ApplySettings();
 
         local settings = GoldPlanner.db.settings.statsBox;
