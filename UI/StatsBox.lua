@@ -5,8 +5,6 @@ GoldPlanner.UI = GoldPlanner.UI or {};
 local StatsBox = {};
 GoldPlanner.UI.StatsBox = StatsBox;
 
-local trim = GoldPlanner.Utils.TrimGold;
-
 function StatsBox:Build(parent)
     if self.statsBox then
         return;
@@ -66,7 +64,7 @@ function StatsBox:Update()
     local goal = GP.Data.Goal:Get();
     local total = GP.Data.Gold:GetTotalCopper();
 
-    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), trim));
+    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), true));
     frame.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
 
     if goal > 0 then
