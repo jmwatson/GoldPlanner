@@ -156,7 +156,7 @@ function ProgressBar:SavePosition()
     end
 end
 
-function ProgressBar:ResetProgressBar()
+function ProgressBar:Reset()
     local DB = GoldPlanner.DB;
 
     if not DB:IsInitialized() then

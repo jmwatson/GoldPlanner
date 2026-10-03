@@ -300,7 +300,7 @@ function _Settings:Build()
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
-        GoldPlanner.UI.ProgressBar:ResetProgressBar();
+        GoldPlanner.UI.ProgressBar:Reset();
         GoldPlanner.UI.ProgressBar:ApplySettings();
 
         local settings = GoldPlanner.db.settings.progressBar;
