@@ -34,9 +34,11 @@ function Format.Rate(hourlyCopper, shouldTrim)
         return string.format("%s: %s", STRINGS.RATE, STRINGS.NOT_ENOUGH_DATA);
     end
 
+    local up = "|TInterface\\AddOns\\GoldPlanner\\Assets\\Up:8:8|t";
+    local down = "|TInterface\\AddOns\\GoldPlanner\\Assets\\Down:8:8|t";
     local value = shouldTrim and trim(hourlyCopper) or hourlyCopper;
 
-    return string.format("%s: %s/hour", STRINGS.RATE, GetMoneyString(value, true));
+    return string.format("%s: %s / hour %s", STRINGS.RATE, GetMoneyString(value, true), value >= 0 and up or down);
 end
 
 function Format.TimeToGoal(goalCopper, seconds)
