@@ -90,8 +90,8 @@ local function BuildGoalDeadline(parent, anchor)
     end);
 
     editbox:SetScript("OnEscapePressed", function(self)
-        local deadline = GoldPlanner.db.goal.deadline;
-        editbox:SetText(deadline and tostring(math.floor((GoldPlanner.db.goal.deadline - time()) / 86400)) or "");
+        local deadline = GoldPlanner.Data.Goal:GetDeadline();
+        editbox:SetText(deadline and tostring(math.floor((deadline - time()) / 86400)) or "");
         self:ClearFocus();
     end);
 
