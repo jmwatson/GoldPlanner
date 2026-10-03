@@ -8,7 +8,7 @@ GoldPlanner.Data.Gold = Gold;
 local Account = GoldPlanner.Data.Account;
 
 function Gold:GetCharacterCopper()
-    local character = Account:GetCharacter();
+    local character = Account:FindCharacter();
     return character and character.copper or 0;
 end
 
