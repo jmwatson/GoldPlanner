@@ -9,7 +9,6 @@
 
 Core/Constants.lua
 Core/Utils.lua
-Core/Init.lua
 Core/Database.lua
 
 Data/Account.lua
@@ -29,3 +28,5 @@ UI/Format.lua
 UI/Dashboard.lua
 UI/ProgressBar.lua
 UI/StatsBox.lua
+
+Core/Init.lua
