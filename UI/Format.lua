@@ -12,6 +12,9 @@ local DAY = 86400;
 local HOUR = 3600;
 local MINUTE = 60;
 
+local ARROW_UP = "|TInterface\\AddOns\\GoldPlanner\\Assets\\Up:8:8|t";
+local ARROW_DOWN = "|TInterface\\AddOns\\GoldPlanner\\Assets\\Down:8:8|t";
+
 function Format.Duration(seconds)
     local days = math.floor(seconds / DAY);
     seconds = seconds % DAY;
@@ -34,9 +37,15 @@ function Format.Rate(hourlyCopper, shouldTrim)
         return string.format("%s: %s", STRINGS.RATE, STRINGS.NOT_ENOUGH_DATA);
     end
 
-    local value = shouldTrim and trim(hourlyCopper) or hourlyCopper;
+    local sign = hourlyCopper < 0 and "-" or "";
+    local value = math.abs(hourlyCopper);
+    value = shouldTrim and trim(value) or value;
 
-    return string.format("%s: %s/hour", STRINGS.RATE, GetMoneyString(value, true));
+    return string.format("%s: %s%s / hour %s",
+        STRINGS.RATE,
+        sign,
+        GetMoneyString(value, true),
+        hourlyCopper < 0 and ARROW_DOWN or ARROW_UP);
 end
 
 function Format.TimeToGoal(goalCopper, seconds)
