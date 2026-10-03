@@ -104,8 +104,8 @@ function Overview:Update()
 
     local total = Gold:GetTotalCopper();
 
-    self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacter(), true));
-    self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarband(), true));
+    self.characterGold:SetText("Character: " .. GetMoneyString(Gold:GetCharacterCopper(), true));
+    self.warbandGold:SetText("Warband: " .. GetMoneyString(Gold:GetWarbandCopper(), true));
     self.totalGold:SetText("Total: " .. GetMoneyString(total, true));
 
     local goal = Goal:Get();

@@ -7,12 +7,12 @@ GoldPlanner.Data.Gold = Gold;
 
 local Account = GoldPlanner.Data.Account;
 
-function Gold:GetCharacter()
+function Gold:GetCharacterCopper()
     local character = Account:GetCharacter();
     return character and character.copper or 0;
 end
 
-function Gold:GetWarband()
+function Gold:GetWarbandCopper()
     return Account:GetWarband().copper;
 end
 
