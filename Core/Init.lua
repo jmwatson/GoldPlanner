@@ -110,9 +110,8 @@ local function HandleSlashCommand(parameters)
     elseif command == "settings" then
         Settings.OpenToCategory(GoldPlanner.UI.Settings.category:GetID());
     elseif command == "maps" then
-        GoldPlanner:PrintMapChain();
+        GoldPlanner.Activities.WorldQuests:PrintMapChain();
     elseif command == "wq" then
-        -- GoldPlanner.UI.WorldQuests:RefreshWorldQuestGold();
         Dashboard:ShowWQ();
     elseif command == "wqdebug" then
         local mapID = tonumber(value);
@@ -121,7 +120,7 @@ local function HandleSlashCommand(parameters)
             mapID = C_Map.GetBestMapForUnit("player");
         end
 
-        GoldPlanner:DebugMapQuests(mapID);
+        GoldPlanner.Activities.WorldQuests:DebugMapQuests(mapID);
     elseif command == "overview" then
         Dashboard:ShowOverview();
     else
