@@ -151,7 +151,7 @@ local function SetupHistory()
         GoldPlanner.Data.History:SetTotalSource(function()
             return GoldPlanner.Data.Gold:GetTotalCopper();
         end);
-        GoldPlanner.Data.History:CompactAll(GoldPlanner.Data.Account:GetAllHistories());
+        GoldPlanner.Data.History:CompactAll(GoldPlanner.Data.Account:GetCharacters(), GoldPlanner.Data.Account:GetWarband());
 end
 
 local function BuildUI()

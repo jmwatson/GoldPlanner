@@ -41,15 +41,3 @@ end
 function Account:GetWarband()
     return GoldPlanner.db.warband;
 end
-
-function Account:GetAllHistories()
-    local histories = {};
-
-    for _, character in pairs(self:GetCharacters()) do
-        table.insert(histories, character.history);
-    end
-
-    table.insert(histories, self:GetWarband().history);
-
-    return histories;
-end

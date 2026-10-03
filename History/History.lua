@@ -100,7 +100,7 @@ function History:RequestTotalSnapshot()
     end);
 end
 
-function History:CompactAll(histories)
+function History:CompactAll(characters, warband)
     local now = time();
     local db = GoldPlanner.db;
     local lastCompaction = db.lastCompaction;
@@ -109,10 +109,11 @@ function History:CompactAll(histories)
         return;
     end
 
-    for _, history in pairs(histories) do
-        CompactHistory(history, now);
+    for _, character in pairs(characters) do
+        CompactHistory(character.history, now);
     end
 
+    CompactHistory(warband.history, now);
     CompactHistory(db.totalHistory, now);
     db.lastCompaction = now;
 
