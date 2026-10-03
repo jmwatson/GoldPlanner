@@ -7,6 +7,7 @@ GoldPlanner.Data.History = History;
 
 local tinsert = table.insert;
 local totalHistoryPending = false;
+local totalSource = nil;
 
 local TIMESTAMP = 1;
 local COPPER = 2;
@@ -22,18 +23,6 @@ local COMPACTION_WINDOWS = {
     { age = 90 * DAY, bucket = DAY },
     { age = math.huge, bucket = WEEK },
 };
-
-local function AddHistorySnapshot(history, copper)
-    local lastSnapshot = history[#history];
-    local snapshot = { time(), copper };
-
-    -- Don't record enteries if nothing has changed
-    if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
-        return;
-    end
-
-    tinsert(history, snapshot);
-end
 
 local function CompactHistory(history, now)
     if #history < 30 then
@@ -73,28 +62,31 @@ local function CompactHistory(history, now)
         end
     end
 
-    return compacted;
+    wipe(history);
+
+    for i = 1, #compacted do
+        history[i] = compacted[i];
+    end
 end
 
-function History:AddCharacterSnapshot()
-    local character = GoldPlanner.Data.Gold:GetCharacter();
-    AddHistorySnapshot(character.history, character.copper);
+function History:Record(history, copper)
+    local lastSnapshot = history[#history];
+    local snapshot = { time(), copper };
+
+    -- Don't record enteries if nothing has changed
+    if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
+        return;
+    end
+
+    tinsert(history, snapshot);
 end
 
-function History:AddWarbandSnapshot()
-    AddHistorySnapshot(GoldPlanner.db.warband.history, GoldPlanner.db.warband.copper);
+function History:SetTotalSource(provider)
+    totalSource = provider;
 end
 
-function History:AddTotalSnapshot()
-    AddHistorySnapshot(GoldPlanner.db.totalHistory, GoldPlanner.Data.Gold:GetTotalCopper());
-end
-
-function History:GetTotal()
-    return GoldPlanner.db.totalHistory;
-end
-
-function History:ScheduleTotalSnapshot()
-    if totalHistoryPending then
+function History:RequestTotalSnapshot()
+    if totalHistoryPending or not totalSource then
         return;
     end
 
@@ -103,11 +95,12 @@ function History:ScheduleTotalSnapshot()
     -- This happens at the end of the current frame to avoid multiple snapshots being added in the same frame
     C_Timer.After(0, function()
         totalHistoryPending = false;
-        self:AddTotalSnapshot();
+        self:Record(GoldPlanner.db.totalHistory, totalSource());
+        EventRegistry:TriggerEvent(GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED);
     end);
 end
 
-function History:CompactAllHistory()
+function History:CompactAll(characters, warband)
     local now = time();
     local db = GoldPlanner.db;
     local lastCompaction = db.lastCompaction;
@@ -116,13 +109,73 @@ function History:CompactAllHistory()
         return;
     end
 
-    for _, character in pairs(db.characters) do
-        character.history = CompactHistory(character.history, now);
+    for _, character in pairs(characters) do
+        CompactHistory(character.history, now);
     end
 
-    db.warband.history = CompactHistory(db.warband.history, now);
-    db.totalHistory = CompactHistory(db.totalHistory, now);
+    CompactHistory(warband.history, now);
+    CompactHistory(db.totalHistory, now);
     db.lastCompaction = now;
 
-    GoldPlanner.Utils:Log("History compaction complete.")
+    GoldPlanner.Utils.Log("History compaction complete.")
+end
+
+function History:GetCopperAt(timestamp)
+    local history = GoldPlanner.db.totalHistory;
+    local first = history[1];
+
+    if not first then
+        return nil;
+    end
+
+    if timestamp <= first[TIMESTAMP] then
+        return first[COPPER];
+    end
+
+    for i = 1, #history - 1 do
+        first = history[i];
+        local second = history[i + 1];
+
+        if first[TIMESTAMP] <= timestamp and timestamp <= second[TIMESTAMP] then
+            local span = second[TIMESTAMP] - first[TIMESTAMP];
+
+            if span <= 0 then
+                return first[COPPER];
+            end
+
+            -- Interpolate between the two snapshots due to compaction
+            local progress = (timestamp - first[TIMESTAMP]) / span;
+            return first[COPPER] + (second[COPPER] - first[COPPER]) * progress;
+        end
+    end
+
+    return history[#history][COPPER];
+end
+
+function History:GetWindow(windowSeconds)
+    local history = GoldPlanner.db.totalHistory;
+
+    if #history < 2 then
+        return nil;
+    end
+
+    local latest = history[#history];
+    local cutoff = latest[TIMESTAMP] - windowSeconds;
+    local oldest = history[1];
+
+    for i = 1, #history do
+        local snapshot = history[i];
+
+        if snapshot[TIMESTAMP] >= cutoff then
+            oldest = snapshot;
+            break;
+        end
+    end
+
+    return {
+        startTime = oldest[TIMESTAMP],
+        startCopper = oldest[COPPER],
+        endTime = latest[TIMESTAMP],
+        endCopper = latest[COPPER],
+    };
 end

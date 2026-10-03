@@ -5,36 +5,21 @@ GoldPlanner.Data = GoldPlanner.Data or {};
 local Gold = {};
 GoldPlanner.Data.Gold = Gold;
 
-local function GetCharacterKey()
-    local name = UnitName("player");
-    local realm = GetRealmName();
+local Account = GoldPlanner.Data.Account;
 
-    return name .. "-" .. realm;
+function Gold:GetCharacterCopper()
+    local character = Account:FindCharacter();
+    return character and character.copper or 0;
 end
 
-function Gold:GetCharacter()
-    local key = GetCharacterKey();
-
-    if not GoldPlanner.db.characters[key] then
-        GoldPlanner.db.characters[key] = {
-            name = UnitName("player"),
-            realm = GetRealmName(),
-            copper = 0,
-            history = {},
-        };
-    end
-
-    return GoldPlanner.db.characters[key];
-end
-
-function Gold:GetWarband()
-    return GoldPlanner.db.warband;
+function Gold:GetWarbandCopper()
+    return Account:GetWarband().copper;
 end
 
 function Gold:GetTotalCopper()
-    local copperTotal = GoldPlanner.db.warband.copper;
+    local copperTotal = Account:GetWarband().copper;
 
-    for _, character in pairs(GoldPlanner.db.characters) do
+    for _, character in pairs(Account:GetCharacters()) do
         copperTotal = copperTotal + character.copper;
     end
 
@@ -42,17 +27,17 @@ function Gold:GetTotalCopper()
 end
 
 function Gold:UpdateCharacterCopper()
-    local character = Gold:GetCharacter();
+    local character = Account:GetCharacter();
 
     character.copper = GetMoney();
-
-    GoldPlanner.Data.History:AddCharacterSnapshot();
-    GoldPlanner.Data.History:ScheduleTotalSnapshot();
+    
+    return character.copper;
 end
 
 function Gold:UpdateWarbandCopper()
-    GoldPlanner.db.warband.copper = C_Bank.FetchDepositedMoney(Enum.BankType.Account);
+    local warband = Account:GetWarband();
 
-    GoldPlanner.Data.History:AddWarbandSnapshot();
-    GoldPlanner.Data.History:ScheduleTotalSnapshot();
+    warband.copper = C_Bank.FetchDepositedMoney(Enum.BankType.Account);
+
+    return warband.copper;
 end

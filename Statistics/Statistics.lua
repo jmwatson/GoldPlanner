@@ -5,15 +5,8 @@ GoldPlanner.Data = GoldPlanner.Data or {};
 local Statistics = {};
 GoldPlanner.Data.Statistics = Statistics;
 
-local trim = GoldPlanner.Utils.TrimGold;
-
-local DAY = 86400;
 local HOUR = 3600;
-local MINUTE = 60;
 local STATISTICS_WINDOW = HOUR;
-
-local TIMESTAMP = 1;
-local COPPER = 2;
 
 local function GetStartOfToday()
     local today = date("*t");
@@ -23,82 +16,21 @@ local function GetStartOfToday()
     return time(today);
 end
 
-local function FormatDuration(seconds)
-    local days = math.floor(seconds / DAY);
-    seconds = seconds % DAY;
-
-    local hours = math.floor(seconds / HOUR);
-    seconds = seconds % HOUR;
-
-    local minutes = math.floor(seconds / MINUTE);
-    if days > 0 then
-        return string.format("%dd %dh %dm", days, hours, minutes);
-    elseif hours > 0 then
-        return string.format("%dh %dm", hours, minutes);
-    end
-
-    return string.format("%dm", minutes);
-end
-
-local function GetCopperAt(history, timestamp)
-    local first = history[1]
-
-    if timestamp <= first[TIMESTAMP] then
-        return first[COPPER];
-    end
-
-    for i = 1, #history - 1 do
-        first = history[i];
-        local second = history[i + 1];
-
-        if first[TIMESTAMP] <= timestamp and timestamp <= second[TIMESTAMP] then
-            local span = second[TIMESTAMP] - first[TIMESTAMP];
-
-            if span <= 0 then
-                return first[COPPER];
-            end
-
-            local progress = (timestamp - first[TIMESTAMP]) / span;
-            return first[COPPER] + (second[COPPER] - first[COPPER]) * progress;
-        end
-    end
-
-    return history[#history][COPPER];
-end
-
 function Statistics:GetMoneyRate(windowSeconds)
-    local history = GoldPlanner.Data.History:GetTotal();
+    local window = GoldPlanner.Data.History:GetWindow(windowSeconds);
 
     -- Not enough history to calculate a rate
-    if #history < 2 then
+    if not window then
         return nil;
     end
 
-    local latest = history[#history];
-    local cutoff = latest[TIMESTAMP] - windowSeconds;
-    local oldest = nil;
+    local elapsed = window.endTime - window.startTime;
 
-    for i = 1, #history do
-        local snapshot = history[i];
-
-        if snapshot[TIMESTAMP] >= cutoff then
-            oldest = snapshot;
-            break;
-        end
-    end
-
-    if not oldest then
-        oldest = history[1];
-    end
-
-    local elapsed = latest[TIMESTAMP] - oldest[TIMESTAMP];
-
-    -- Another window check to make sure we don't divide by zero
     if elapsed <= 0 then
         return nil;
     end
 
-    local copperDelta = latest[COPPER] - oldest[COPPER];
+    local copperDelta = window.endCopper - window.startCopper;
 
     return {
         copperDelta = copperDelta,
@@ -107,25 +39,32 @@ function Statistics:GetMoneyRate(windowSeconds)
     };
 end
 
-function Statistics:GetCopperEarnedSince(timestamp)
-    local history = GoldPlanner.Data.History:GetTotal();
+function Statistics:GetHourlyRate()
+    local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
 
-    if #history < 1 then
+    if not statistics then
+        return nil;
+    end
+
+    return statistics.rate * STATISTICS_WINDOW;
+end
+
+function Statistics:GetCopperEarnedSince(timestamp, currentCopper)
+    local startCopper = GoldPlanner.Data.History:GetCopperAt(timestamp);
+
+    if not startCopper then
         return 0;
     end
 
-    local startCopper = GetCopperAt(history, timestamp)
-    return GoldPlanner.Data.Gold:GetTotalCopper() - startCopper;
+    return currentCopper - startCopper;
 end
 
-function Statistics:GetDailyGoalProgress()
-    local dailyGoal = GoldPlanner.Data.Goal:GetDaily();
-
+function Statistics:GetDailyGoalProgress(dailyGoal, currentCopper)
     if not dailyGoal or dailyGoal <= 0 then
         return nil;
     end
 
-    local earnedToday = self:GetCopperEarnedSince(GetStartOfToday());
+    local earnedToday = self:GetCopperEarnedSince(GetStartOfToday(), currentCopper);
 
     return {
         target = dailyGoal,
@@ -133,19 +72,6 @@ function Statistics:GetDailyGoalProgress()
         remaining = math.max(dailyGoal - earnedToday, 0);
         progress = math.min(earnedToday / dailyGoal, 1);
     };
-end
-
-function Statistics:GetDailyGoalDisplay()
-    local daily = self:GetDailyGoalProgress();
-
-    if not daily then
-        return nil;
-    end
-
-    local earned = trim(daily.earned);
-    local target = trim(daily.target);
-
-    return string.format("%s / %s today", GetMoneyString(earned, true), GetMoneyString(target, true));
 end
 
 function Statistics:GetTimeToAmount(currentCopper, targetCopper, rate)
@@ -162,38 +88,16 @@ function Statistics:GetTimeToAmount(currentCopper, targetCopper, rate)
     return copperDelta / rate;
 end
 
-function Statistics:GetMoneyRateDisplay(trim)
+function Statistics:GetTimeToGoal(currentCopper, goalCopper)
+    if not goalCopper or goalCopper <= 0 then
+        return nil;
+    end
+
     local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
 
     if not statistics then
         return nil;
     end
 
-    local windowRate = statistics.rate * STATISTICS_WINDOW;
-
-    if trim then
-        return GetMoneyString(trim(windowRate), true);
-    else
-        return GetMoneyString(windowRate, true);
-    end
-end
-
-function Statistics:GetTimeToGoalDisplay()
-    local goal = GoldPlanner.Data.Goal:Get();
-    local totalCopper = GoldPlanner.Data.Gold:GetTotalCopper();
-    local statistics = self:GetMoneyRate(STATISTICS_WINDOW);
-
-    if (goal <= 0) or (not statistics or statistics.rate <= 0) then
-        return nil;
-    elseif totalCopper >= goal then
-        return self.STRINGS.REACHED;
-    end
-
-    local seconds = self:GetTimeToAmount(totalCopper, goal, statistics.rate);
-
-    if not seconds then
-        return nil;
-    end
-    
-    return FormatDuration(seconds);
+    return self:GetTimeToAmount(currentCopper, goalCopper, statistics.rate);
 end

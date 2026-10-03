@@ -107,7 +107,7 @@ function WorldQuests:Update()
     local rows = self.rows;
     local quests = {};
 
-    for _, quest in pairs(WQ.Get()) do
+    for _, quest in pairs(WQ:Get()) do
         if (quest.gold or 0) > 0 then
             quests[#quests + 1] = quest;
         end

@@ -110,9 +110,8 @@ local function HandleSlashCommand(parameters)
     elseif command == "settings" then
         Settings.OpenToCategory(GoldPlanner.UI.Settings.category:GetID());
     elseif command == "maps" then
-        GoldPlanner:PrintMapChain();
+        GoldPlanner.Activities.WorldQuests:PrintMapChain();
     elseif command == "wq" then
-        -- GoldPlanner.UI.WorldQuests:RefreshWorldQuestGold();
         Dashboard:ShowWQ();
     elseif command == "wqdebug" then
         local mapID = tonumber(value);
@@ -121,7 +120,7 @@ local function HandleSlashCommand(parameters)
             mapID = C_Map.GetBestMapForUnit("player");
         end
 
-        GoldPlanner:DebugMapQuests(mapID);
+        GoldPlanner.Activities.WorldQuests:DebugMapQuests(mapID);
     elseif command == "overview" then
         Dashboard:ShowOverview();
     else
@@ -136,12 +135,33 @@ local function RegisterSlashCommands()
     SlashCmdList["GOLDPLANNER"] = HandleSlashCommand;
 end
 
-local function HandleEvents(self, event, ...)
-    local Overview = GoldPlanner.UI.Overview;
-    local StatsBox = GoldPlanner.UI.StatsBox;
-    local ProgressBar = GoldPlanner.UI.ProgressBar;
-    local Gold = GoldPlanner.Data.Gold;
+local function RecordCharacterGold()
+    local copper = GoldPlanner.Data.Gold:UpdateCharacterCopper();
+    GoldPlanner.Data.History:Record(GoldPlanner.Data.Account:GetCharacter().history, copper);
+    GoldPlanner.Data.History:RequestTotalSnapshot();
+end
 
+local function RecordWarbandGold()
+    local copper = GoldPlanner.Data.Gold:UpdateWarbandCopper();
+    GoldPlanner.Data.History:Record(GoldPlanner.Data.Account:GetWarband().history, copper);
+    GoldPlanner.Data.History:RequestTotalSnapshot();
+end
+
+local function SetupHistory()
+        GoldPlanner.Data.History:SetTotalSource(function()
+            return GoldPlanner.Data.Gold:GetTotalCopper();
+        end);
+        GoldPlanner.Data.History:CompactAll(GoldPlanner.Data.Account:GetCharacters(), GoldPlanner.Data.Account:GetWarband());
+end
+
+local function BuildUI()
+    GoldPlanner.UI.Settings:Build();
+    GoldPlanner.UI.Dashboard:Build();
+    GoldPlanner.UI.StatsBox:Build();
+    GoldPlanner.UI.ProgressBar:Build();
+end
+
+local function HandleEvents(self, event, ...)
     if event == EVENTS.ADDON_LOADED then
         local loadedAddonName = ...;
 
@@ -150,31 +170,19 @@ local function HandleEvents(self, event, ...)
         end
 
         GoldPlanner.DB:InitializeDatabase();
-        GoldPlanner.Data.History:CompactAllHistory();
-        GoldPlanner.UI.Settings:Build();
-        GoldPlanner.UI.Dashboard:Build();
-        ProgressBar:Build();
-        StatsBox:Build();
+        SetupHistory();
+        BuildUI();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
-        Gold:UpdateCharacterCopper();
-        Gold:UpdateWarbandCopper();
-        Overview:Update();
-        ProgressBar:Update();
-        StatsBox:Update();
+        RecordCharacterGold();
+        RecordWarbandGold();
     elseif event == EVENTS.PLAYER_MONEY then
-        Gold:UpdateCharacterCopper();
-        Overview:Update();
-        ProgressBar:Update();
-        StatsBox:Update();
+        RecordCharacterGold();
     elseif event == EVENTS.ACCOUNT_MONEY then
-        Gold:UpdateWarbandCopper();
-        Overview:Update();
-        ProgressBar:Update();
-        StatsBox:Update();
+        RecordWarbandGold();
     elseif event == EVENTS.QUEST_LOG_UPDATE then
         local WQ = GoldPlanner.Activities.WorldQuests;
-        local pending = WQ.GetPending();
+        local pending = WQ:GetPending();
         local resolvedAny = false;
 
         for questID in pairs(pending) do

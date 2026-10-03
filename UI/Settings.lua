@@ -90,8 +90,8 @@ local function BuildGoalDeadline(parent, anchor)
     end);
 
     editbox:SetScript("OnEscapePressed", function(self)
-        local deadline = GoldPlanner.db.goal.deadline;
-        editbox:SetText(deadline and tostring(math.floor((GoldPlanner.db.goal.deadline - time()) / 86400)) or "");
+        local deadline = GoldPlanner.Data.Goal:GetDeadline();
+        editbox:SetText(deadline and tostring(math.floor((deadline - time()) / 86400)) or "");
         self:ClearFocus();
     end);
 
@@ -267,10 +267,7 @@ local function BuildStatsPadding(addonName, category, settings)
     Settings.CreateSlider(category, paddingSetting, options, description);
 
     paddingSetting:SetValueChangedCallback(function(_, value)
-        GoldPlanner.UI.StatsBox:SetPadding(
-            settings.padding,
-            value
-        );
+        GoldPlanner.UI.StatsBox:SetPadding(value);
     end);
 
     return paddingSetting;
@@ -303,7 +300,7 @@ function _Settings:Build()
     local goalEditBox = BuildGoalAmount(panel);
     local deadlineEditBox = BuildGoalDeadline(panel, goalEditBox);
     local resetProgressBarButton = CreateResetButton(panel, deadlineEditBox, "Reset Progress Bar", function()
-        GoldPlanner:ResetProgressBar();
+        GoldPlanner.UI.ProgressBar:Reset();
         GoldPlanner.UI.ProgressBar:ApplySettings();
 
         local settings = GoldPlanner.db.settings.progressBar;
@@ -313,7 +310,7 @@ function _Settings:Build()
         heightProgressBarSetting:SetValue(settings.height);
     end);
     local resetStatsBoxButton = CreateResetButton(panel, resetProgressBarButton, "Reset Stats Box", function()
-        GoldPlanner:ResetStatsBoxSettings();
+        GoldPlanner.UI.StatsBox:ResetStatsBoxSettings();
         GoldPlanner.UI.StatsBox:ApplySettings();
 
         local settings = GoldPlanner.db.settings.statsBox;

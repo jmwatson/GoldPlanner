@@ -58,6 +58,8 @@ function ProgressBar:Build()
 
     frame.progress = progress;
 
+    self:RegisterEvents();
+
     self.progressBar = frame;
 
     self:Update();
@@ -154,7 +156,7 @@ function ProgressBar:SavePosition()
     end
 end
 
-function ProgressBar:ResetProgressBar()
+function ProgressBar:Reset()
     local DB = GoldPlanner.DB;
 
     if not DB:IsInitialized() then
@@ -162,4 +164,12 @@ function ProgressBar:ResetProgressBar()
     end
 
     DB:ResetTable(GoldPlanner.db.settings.progressBar, DB:GetDefaults().settings.progressBar);
+end
+
+function ProgressBar:RegisterEvents()
+    EventRegistry:RegisterCallback(
+        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        self.Update,
+        self
+    );
 end

@@ -42,17 +42,17 @@ local DEFAULT_DATABASE = {
     },
 };
 
-function DB:CopyDefaults(source, target)
+local function CopyDefaults(source, target)
     for key, value in pairs(source) do
         if target[key] == nil then
             if type(value) == "table" then
                 target[key] = {};
-                self:CopyDefaults(value, target[key]);
+                CopyDefaults(value, target[key]);
             else
                 target[key] = value;
             end
         elseif type(value) == "table" and type(target[key]) == "table" then
-            self:CopyDefaults(value, target[key]);
+            CopyDefaults(value, target[key]);
         end
     end
 end
@@ -62,7 +62,7 @@ function DB:ResetTable(target, defaults)
         target[key] = nil;
     end
 
-    self:CopyDefaults(defaults, target);
+    CopyDefaults(defaults, target);
 end
 
 function DB:InitializeDatabase()
@@ -70,7 +70,7 @@ function DB:InitializeDatabase()
         GoldPlannerDB = {};
     end
 
-    self:CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
+    CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
 
     GoldPlanner.db = GoldPlannerDB;
 end

@@ -5,8 +5,6 @@ GoldPlanner.UI = GoldPlanner.UI or {};
 local StatsBox = {};
 GoldPlanner.UI.StatsBox = StatsBox;
 
-local trim = GoldPlanner.Utils.TrimGold;
-
 function StatsBox:Build(parent)
     if self.statsBox then
         return;
@@ -48,6 +46,8 @@ function StatsBox:Build(parent)
 
     self.statsBox = frame;
 
+    self:RegisterEvents();
+
     self:Update();
 end
 
@@ -58,28 +58,18 @@ function StatsBox:Update()
 
     local GP = GoldPlanner;
     local Stats = GP.Data.Statistics;
-    local sformat = string.format;
+    local Goal = GP.Data.Goal;
+    local Format = GP.UI.Format;
     local frame = self.statsBox;
     local goal = GP.Data.Goal:Get();
+    local total = GP.Data.Gold:GetTotalCopper();
 
-    if goal <= 0 then
-        frame.timeToGoal:SetText(sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.NO_GOAL));
-    else
-        local timeToGoal = Stats:GetTimeToGoalDisplay();
-        frame.timeToGoal:SetText(timeToGoal and
-            sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, timeToGoal) or
-            sformat("%s: %s", GP.STRINGS.TIME_TO_GOAL, GP.STRINGS.UNAVAILABLE));
+    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), true));
+    frame.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
 
-        local dailyGoalDisplay = Stats:GetDailyGoalDisplay();
-        frame.dailyGoal:SetText(dailyGoalDisplay and
-            sformat("%s: %s", GP.STRINGS.DAILY_GOAL, dailyGoalDisplay) or
-            sformat("%s: %s", GP.STRINGS.DAILY_GOAL, GP.STRINGS.NO_DEADLINE));
+    if goal > 0 then
+        frame.dailyGoal:SetText(Format.DailyGoal(Stats:GetDailyGoalProgress(Goal:GetDaily(), total)));
     end
-
-    local rateDisplay = Stats:GetMoneyRateDisplay(trim);
-    frame.rate:SetText(rateDisplay and
-        sformat("%s: %s/hour", GP.STRINGS.RATE, rateDisplay) or
-        sformat("%s: %s", GP.STRINGS.RATE, GP.STRINGS.NOT_ENOUGH_DATA));
 
     local width = math.max(frame.rate:GetStringWidth(), frame.timeToGoal:GetStringWidth(), frame.dailyGoal:GetStringWidth());
     local height = frame.rate:GetStringHeight() + frame.timeToGoal:GetStringHeight() + frame.dailyGoal:GetStringHeight();
@@ -138,12 +128,20 @@ function StatsBox:SavePosition()
     end
 end
 
-function GoldPlanner:ResetStatsBoxSettings()
+function StatsBox:ResetStatsBoxSettings()
     local DB = GoldPlanner.DB;
 
     if not DB:IsInitialized() then
         DB:InitializeDatabase();
     end
 
-    DB:ResetTable(self.db.settings.statsBox, DB:GetDefaults().settings.statsBox);
+    DB:ResetTable(GoldPlanner.db.settings.statsBox, DB:GetDefaults().settings.statsBox);
+end
+
+function StatsBox:RegisterEvents()
+    EventRegistry:RegisterCallback(
+        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        self.Update,
+        self
+    );
 end
