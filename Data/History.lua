@@ -154,22 +154,32 @@ end
 
 function History:GetWindow(windowSeconds)
     local history = GoldPlanner.db.totalHistory;
+    local count = #history;
 
-    if #history < 2 then
+    if count < 2 then
         return nil;
     end
 
-    local latest = history[#history];
+    local latest = history[count];
     local cutoff = latest[TIMESTAMP] - windowSeconds;
-    local oldest = history[1];
+    local oldest = nil;
 
-    for i = 1, #history do
+    -- Walk history backwards to find the oldest snapshot within the window,
+    -- or the oldest snapshot before the cutoff if none are within the window
+    for i = count - 1, 1, -1 do
         local snapshot = history[i];
 
-        if snapshot[TIMESTAMP] >= cutoff then
-            oldest = snapshot;
-            break;
+        if snapshot[TIMESTAMP] < latest[TIMESTAMP] then
+            if not oldest or snapshot[TIMESTAMP] >= cutoff then
+                oldest = snapshot;
+            else
+                break;
+            end
         end
+    end
+
+    if not oldest then
+        return nil;
     end
 
     return {
