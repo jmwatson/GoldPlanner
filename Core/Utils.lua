@@ -12,5 +12,6 @@ function Utils.Log(...)
 end
 
 function Utils.TrimGold(copper)
-    return math.floor(copper / 10000) * 10000;
+    local sign = copper < 0 and -1 or 1;
+    return sign * math.floor(math.abs(copper) / 10000) * 10000;
 end
