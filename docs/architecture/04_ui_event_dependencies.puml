@@ -1,0 +1,43 @@
+@startuml GoldPlanner_UI_Event_Dependencies
+title GoldPlanner - UI Event Dependencies
+left to right direction
+
+rectangle "GoldPlanner Domain Events" {
+  component "GOAL_UPDATED" as GoalUpdated
+  component "HISTORY_TOTAL_UPDATED" as HistoryUpdated
+}
+rectangle "Blizzard Frame Events" {
+  component "QUEST_LOG_UPDATE" as QuestLogUpdate
+  component "PLAYER_LOGIN" as PlayerLogin
+}
+rectangle "UI Components" {
+  component "Overview" as Overview
+  component "StatsBox" as StatsBox
+  component "ProgressBar" as ProgressBar
+  component "WorldQuests" as WorldQuests
+  component "Settings" as Settings
+  component "Dashboard" as Dashboard
+}
+
+GoalUpdated --> Overview : RegisterCallback()
+HistoryUpdated --> Overview : RegisterCallback()
+GoalUpdated --> StatsBox : RegisterCallback()
+HistoryUpdated --> StatsBox : RegisterCallback()
+GoalUpdated --> ProgressBar : RegisterCallback()
+HistoryUpdated --> ProgressBar : RegisterCallback()
+QuestLogUpdate --> WorldQuests : RegisterFrameEventAndCallback()
+PlayerLogin --> Settings : Build()
+PlayerLogin --> Dashboard : Build()
+PlayerLogin --> StatsBox : Build()
+PlayerLogin --> ProgressBar : Build()
+
+note right of Overview
+Initial rendering occurs during Build().
+Subsequent domain changes use callbacks.
+end note
+
+note bottom of QuestLogUpdate
+WorldQuests directly owns QUEST_LOG_UPDATE.
+This is the primary GOL-32 UI-local event case.
+end note
+@enduml

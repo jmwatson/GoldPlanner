@@ -1,0 +1,41 @@
+@startuml GoldPlanner_Gold_History_Sequence
+title GoldPlanner - Gold / History Event Sequence
+
+actor "WoW Client" as WoW
+participant "Gold" as Gold
+participant "EventRegistry" as ER
+participant "History" as History
+participant "Overview" as Overview
+participant "StatsBox" as StatsBox
+participant "ProgressBar" as ProgressBar
+
+WoW -> Gold : PLAYER_MONEY
+activate Gold
+Gold -> Gold : UpdateCharacterCopper()
+Gold -> ER : TriggerEvent(CHARACTER_COPPER_UPDATED)
+deactivate Gold
+
+ER -> History : CHARACTER_COPPER_UPDATED
+activate History
+History -> History : RecordCharacterSnapshot(copper)
+History -> History : Record(character.history, copper)
+History -> History : RequestTotalSnapshot()
+History -> History : C_Timer.After(0)
+History -> History : Record(totalHistory, totalSource())
+History -> ER : TriggerEvent(HISTORY_TOTAL_UPDATED)
+deactivate History
+
+par UI subscribers
+  ER -> Overview : Update()
+and
+  ER -> StatsBox : Update()
+and
+  ER -> ProgressBar : Update()
+end
+
+note over Gold,History
+Gold owns money-state updates.
+History owns snapshot recording.
+Neither module knows which UI consumes the result.
+end note
+@enduml

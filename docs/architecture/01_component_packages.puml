@@ -1,0 +1,82 @@
+@startuml GoldPlanner_Component_Packages
+title GoldPlanner - Component / Package Diagram
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+package "GoldPlanner" {
+  package "Core" {
+    [Init.lua]
+    [Constants.lua]
+    [Database.lua]
+    [Utils.lua]
+  }
+  package "Data" {
+    [Account]
+    [Gold]
+    [History]
+    [Statistics]
+    [Goal]
+  }
+  package "Activities" {
+    [Activities]
+    [WorldQuests]
+  }
+  package "UI" {
+    [Dashboard]
+    [Overview]
+    [StatsBox]
+    [ProgressBar]
+    [Settings]
+    [WorldQuests UI]
+    [Format]
+    [NavMenu]
+  }
+}
+
+component "WoW EventRegistry" as EventRegistry
+component "WoW Client APIs" as WoW
+database "SavedVariables\nGoldPlannerDB" as DB
+
+[Init.lua] --> [Database] : initializes
+[Init.lua] --> [Account] : bootstraps
+[Init.lua] --> [History] : compaction
+[Gold] --> [Account] : reads / updates
+[History] --> [Account] : history state
+[Statistics] --> [History] : calculates
+[Gold] --> EventRegistry : domain events
+[History] --> EventRegistry : domain events
+[Goal] --> EventRegistry : GOAL_UPDATED
+
+[Overview] --> [Gold]
+[Overview] --> [Statistics]
+[Overview] --> [Goal]
+[Overview] --> EventRegistry
+[StatsBox] --> [Gold]
+[StatsBox] --> [Statistics]
+[StatsBox] --> [Goal]
+[StatsBox] --> EventRegistry
+[ProgressBar] --> [Goal]
+[ProgressBar] --> EventRegistry
+[Settings] --> [Goal]
+[Dashboard] --> [Overview]
+[Dashboard] --> [WorldQuests UI]
+[WorldQuests UI] --> [WorldQuests]
+[WorldQuests UI] --> EventRegistry
+
+[Database] --> DB
+[Account] --> DB
+[History] --> DB
+[Goal] --> DB
+
+WoW --> [Gold] : PLAYER_MONEY\nACCOUNT_MONEY\nPLAYER_ENTERING_WORLD
+WoW --> [WorldQuests UI] : QUEST_LOG_UPDATE
+WoW --> [Dashboard] : PLAYER_LOGIN
+WoW --> [Settings] : PLAYER_LOGIN
+WoW --> [StatsBox] : PLAYER_LOGIN
+WoW --> [ProgressBar] : PLAYER_LOGIN
+
+note right of [Init.lua]
+Composition/bootstrap root.
+Does not directly refresh UI.
+end note
+@enduml
