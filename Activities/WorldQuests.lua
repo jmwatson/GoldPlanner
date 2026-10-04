@@ -10,8 +10,16 @@ local Log = GoldPlanner.Utils.Log;
 local PendingRewardData = {};
 local WQs = {};
 
+local function GetZoneInfo(questID, scannedMapID)
+    local zoneID = C_TaskQuest.GetQuestZoneID(questID) or scannedMapID;
+    local mapInfo = C_Map.GetMapInfo(zoneID);
+
+    return zoneID, mapInfo and mapInfo.name or nil;
+end
+
 local function GetWorldQuestInfo(questID, mapID)
     local title = C_TaskQuest.GetQuestInfoByQuestID(questID);
+    local zoneID, zoneName = GetZoneInfo(questID, mapID);
     local x, y = C_TaskQuest.GetQuestLocation(questID, mapID);
     local timeLeft = C_TaskQuest.GetQuestTimeLeftMinutes(questID);
     local money = GetQuestLogRewardMoney(questID);
@@ -28,6 +36,8 @@ local function GetWorldQuestInfo(questID, mapID)
     return {
         questID = questID,
         mapID = mapID,
+        zoneID = zoneID,
+        zoneName = zoneName,
         title = title,
         x = x,
         y = y,
@@ -139,9 +149,11 @@ function WorldQuests:Scan(mapID)
     local quests = GetWorldQuestsOnMap(mapID);
 
     for _, quest in ipairs(quests) do
-        WQs[quest.questID] = quest;
-        PendingRewardData[quest.questID] = true;
-        C_TaskQuest.RequestPreloadRewardData(quest.questID);
+        if not WQs[quest.questID] then
+            WQs[quest.questID] = quest;
+            PendingRewardData[quest.questID] = true;
+            C_TaskQuest.RequestPreloadRewardData(quest.questID);
+        end
     end
 
     return quests;

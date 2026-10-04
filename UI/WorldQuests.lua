@@ -114,7 +114,7 @@ function WorldQuests:Update()
     end
 
     table.sort(quests, function(a, b)
-        return a.gold > b.gold;
+        return a.zoneID > b.zoneID;
     end);
 
     self.totalText:SetText("Total Gold Available: " .. GetMoneyString(WQ:GetTotalGold(), true));
@@ -131,8 +131,7 @@ function WorldQuests:Update()
         row:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, -(index - 1) * ROW_HEIGHT);
         row:SetPoint("RIGHT", scrollChild, "RIGHT", 0, 0);
 
-        local mapInfo = C_Map.GetMapInfo(quest.mapID);
-        local zoneName = mapInfo and mapInfo.name or "Unknown";
+        local zoneName = quest.zoneName and quest.zoneName or "Unknown";
 
         row.gold:SetText(GetMoneyString(quest.gold, true));
         row.title:SetText(string.format("%s (%s)", quest.title or "Unknown Quest", zoneName));
