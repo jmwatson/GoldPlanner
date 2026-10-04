@@ -1,0 +1,42 @@
+name: Render PlantUML Documentation
+
+on:
+  push:
+    paths:
+      - "docs/architecture/**/*.puml"
+      - ".github/workflows/plantuml.yml"
+  pull_request:
+    paths:
+      - "docs/architecture/**/*.puml"
+      - ".github/workflows/plantuml.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    name: Render UML diagrams
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Render PlantUML diagrams
+        run: |
+          mkdir -p docs/architecture/rendered
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            plantuml/plantuml:1.2026.8 \
+            -tsvg \
+            -o /workspace/docs/architecture/rendered \
+            /workspace/docs/architecture
+
+      - name: Upload rendered diagrams
+        uses: actions/upload-artifact@v4
+        with:
+          name: goldplanner-uml
+          path: docs/architecture/rendered/*.svg
+          if-no-files-found: error
+          retention-days: 30
