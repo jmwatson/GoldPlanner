@@ -50,9 +50,6 @@ local function BuildGoalAmount(parent)
 
         if gold and gold > 0 then
             Goal:Set(gold * 10000);
-            GoldPlanner.UI.Overview:Update();
-            GoldPlanner.UI.ProgressBar:Update();
-            GoldPlanner.UI.StatsBox:Update();
         end
 
         self:ClearFocus();
@@ -82,8 +79,6 @@ local function BuildGoalDeadline(parent, anchor)
 
         if days and days > 0 then
             GoldPlanner.Data.Goal:SetDeadline(time() + (days * 86400));
-            GoldPlanner.UI.Overview:Update();
-            GoldPlanner.UI.StatsBox:Update();
         end
 
         self:ClearFocus();

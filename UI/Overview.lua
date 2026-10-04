@@ -5,6 +5,8 @@ GoldPlanner.UI = GoldPlanner.UI or {};
 local Overview = {};
 GoldPlanner.UI.Overview = Overview;
 
+local EVENTS = GoldPlanner.EVENTS;
+
 function Overview:Build(parent)
     if self.built then
         return;
@@ -130,8 +132,12 @@ end
 
 function Overview:RegisterEvents()
     EventRegistry:RegisterCallback(
-        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        EVENTS.HISTORY_TOTAL_UPDATED,
         self.Update,
-        self
-    );
+        self);
+
+    EventRegistry:RegisterCallback(
+        EVENTS.GOAL_UPDATED,
+        self.Update,
+        self);
 end

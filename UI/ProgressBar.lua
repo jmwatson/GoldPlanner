@@ -6,6 +6,7 @@ local ProgressBar = {};
 GoldPlanner.UI.ProgressBar = ProgressBar;
 
 local trim = GoldPlanner.Utils.TrimGold;
+local EVENTS = GoldPlanner.EVENTS;
 
 function ProgressBar:Build()
     if self.progressBar then
@@ -168,10 +169,14 @@ end
 
 function ProgressBar:RegisterEvents()
     EventRegistry:RegisterCallback(
-        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        EVENTS.HISTORY_TOTAL_UPDATED,
         self.Update,
-        self
-    );
+        self);
+
+    EventRegistry:RegisterCallback(
+        EVENTS.GOAL_UPDATED,
+        self.Update,
+        self);
 end
 
-EventRegistry:RegisterFrameEventAndCallback(GoldPlanner.EVENTS.PLAYER_LOGIN, ProgressBar.Build, ProgressBar);
+EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_LOGIN, ProgressBar.Build, ProgressBar);

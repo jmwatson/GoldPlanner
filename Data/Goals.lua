@@ -13,6 +13,7 @@ function Goal:Set(copper)
     end
 
     GoldPlanner.db.goal.copper = copper;
+    EventRegistry:TriggerEvent(GoldPlanner.EVENTS.GOAL_UPDATED);
 end
 
 function Goal:Get()
@@ -40,6 +41,7 @@ function Goal:SetDeadline(timestamp)
     end
 
     GoldPlanner.db.goal.deadline = timestamp;
+    EventRegistry:TriggerEvent(GoldPlanner.EVENTS.GOAL_UPDATED);
 end
 
 function Goal:GetDeadline()

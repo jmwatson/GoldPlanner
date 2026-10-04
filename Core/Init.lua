@@ -86,8 +86,6 @@ local function HandleSlashCommand(parameters)
         end
 
         Goal:Set(gold * 10000);
-        GoldPlanner.UI.Overview:Update();
-        GoldPlanner.UI.ProgressBar:Update();
 
         Log("Goal set to", GetMoneyString(Goal:Get(), true));
     elseif command == "bar" then
