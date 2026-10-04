@@ -1,0 +1,61 @@
+@startuml GoldPlanner_Event_Flow
+title GoldPlanner - Event Flow
+skinparam componentStyle rectangle
+
+rectangle "Blizzard Events" {
+  component "PLAYER_MONEY" as PlayerMoney
+  component "ACCOUNT_MONEY" as AccountMoney
+  component "PLAYER_ENTERING_WORLD" as EnteringWorld
+  component "QUEST_LOG_UPDATE" as QuestLogUpdate
+  component "PLAYER_LOGIN" as PlayerLogin
+}
+
+rectangle "GoldPlanner Domain" {
+  component "Gold" as Gold
+  component "History" as History
+  component "Goal" as Goal
+  component "Activities.WorldQuests" as ActivitiesWQ
+}
+
+rectangle "GoldPlanner Events" {
+  component "CHARACTER_COPPER_UPDATED"
+  component "WARBAND_COPPER_UPDATED"
+  component "HISTORY_TOTAL_UPDATED"
+  component "GOAL_UPDATED"
+}
+
+rectangle "UI Subscribers" {
+  component "Overview"
+  component "StatsBox"
+  component "ProgressBar"
+  component "WorldQuests UI"
+  component "Dashboard"
+  component "Settings"
+}
+
+PlayerMoney --> Gold : OnPlayerMoney()
+AccountMoney --> Gold : OnAccountMoney()
+EnteringWorld --> Gold : OnEnteringWorld()
+Gold --> History : CHARACTER_COPPER_UPDATED
+Gold --> History : WARBAND_COPPER_UPDATED
+History --> "HISTORY_TOTAL_UPDATED" : TriggerEvent()
+"HISTORY_TOTAL_UPDATED" --> Overview : Update()
+"HISTORY_TOTAL_UPDATED" --> StatsBox : Update()
+"HISTORY_TOTAL_UPDATED" --> ProgressBar : Update()
+Goal --> "GOAL_UPDATED" : TriggerEvent()
+"GOAL_UPDATED" --> Overview : Update()
+"GOAL_UPDATED" --> StatsBox : Update()
+"GOAL_UPDATED" --> ProgressBar : Update()
+QuestLogUpdate --> "WorldQuests UI" : RegisterFrameEventAndCallback()
+"WorldQuests UI" --> ActivitiesWQ : ResolvePendingRewards() / ScanAll()
+PlayerLogin --> Dashboard : Build()
+PlayerLogin --> Settings : Build()
+PlayerLogin --> StatsBox : Build()
+PlayerLogin --> ProgressBar : Build()
+
+note bottom
+Blizzard frame events are WoW-level events.
+GoldPlanner events represent domain state changes.
+UI components subscribe to the level they actually depend on.
+end note
+@enduml

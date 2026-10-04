@@ -1,0 +1,30 @@
+@startuml GoldPlanner_WorldQuests_Sequence
+title GoldPlanner - World Quest Event Sequence
+
+actor "WoW Client" as WoW
+participant "UI.WorldQuests" as UIWQ
+participant "Activities.WorldQuests" as ActivitiesWQ
+
+WoW -> UIWQ : QUEST_LOG_UPDATE
+activate UIWQ
+UIWQ -> ActivitiesWQ : ResolvePendingRewards()
+activate ActivitiesWQ
+ActivitiesWQ --> UIWQ : rewards resolved
+deactivate ActivitiesWQ
+
+UIWQ -> UIWQ : RequestUpdate()
+UIWQ -> UIWQ : C_Timer.After(0)
+UIWQ -> ActivitiesWQ : ScanAll()
+activate ActivitiesWQ
+ActivitiesWQ --> UIWQ : world quest data
+deactivate ActivitiesWQ
+UIWQ -> UIWQ : Update()
+deactivate UIWQ
+
+note over WoW,ActivitiesWQ
+This is intentionally a local UI flow.
+No WORLD_QUESTS_UPDATED custom event is needed:
+the UI owns the Blizzard event and the tightly
+coupled activity refresh.
+end note
+@enduml
