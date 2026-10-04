@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir -p docs/architecture/rendered
           docker run --rm \
+            --user "$(id -u):$(id -g)" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             plantuml/plantuml:1.2026.8 \
             -tsvg \
