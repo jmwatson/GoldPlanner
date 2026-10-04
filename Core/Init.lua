@@ -120,49 +120,17 @@ local function RegisterSlashCommands()
     SlashCmdList["GOLDPLANNER"] = HandleSlashCommand;
 end
 
-local function RecordCharacterGold()
-    local copper = GoldPlanner.Data.Gold:UpdateCharacterCopper();
-    GoldPlanner.Data.History:Record(GoldPlanner.Data.Account:GetCharacter().history, copper);
-    GoldPlanner.Data.History:RequestTotalSnapshot();
-end
-
-local function RecordWarbandGold()
-    local copper = GoldPlanner.Data.Gold:UpdateWarbandCopper();
-    GoldPlanner.Data.History:Record(GoldPlanner.Data.Account:GetWarband().history, copper);
-    GoldPlanner.Data.History:RequestTotalSnapshot();
-end
-
-local function SetupHistory()
-        GoldPlanner.Data.History:SetTotalSource(function()
-            return GoldPlanner.Data.Gold:GetTotalCopper();
-        end);
-        GoldPlanner.Data.History:CompactAll(GoldPlanner.Data.Account:GetCharacters(), GoldPlanner.Data.Account:GetWarband());
-end
-
-local function HandleEvents(self, event, ...)
-    if event == EVENTS.ADDON_LOADED then
-        local loadedAddonName = ...;
-
+local function OnAddonLoaded(_, loadedAddonName)
         if loadedAddonName ~= ADDON_NAME then
             return;
         end
 
         GoldPlanner.DB:InitializeDatabase();
-        SetupHistory();
+        GoldPlanner.Data.History:CompactAll(
+            GoldPlanner.Data.Account:GetCharacters(),
+            GoldPlanner.Data.Account:GetWarband());
+        GoldPlanner.Data.Gold:Initialize();
         RegisterSlashCommands();
-    elseif event == EVENTS.PLAYER_ENTERING_WORLD then
-        RecordCharacterGold();
-        RecordWarbandGold();
-    elseif event == EVENTS.PLAYER_MONEY then
-        RecordCharacterGold();
-    elseif event == EVENTS.ACCOUNT_MONEY then
-        RecordWarbandGold();
-    end
 end
 
-local eventFrame = CreateFrame("Frame");
-eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
-eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
-eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
-eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
-eventFrame:SetScript("OnEvent", HandleEvents);
+EventRegistry:RegisterFrameEventAndCallback(EVENTS.ADDON_LOADED, OnAddonLoaded);

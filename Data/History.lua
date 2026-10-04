@@ -16,6 +16,8 @@ local WEEK = 604800;
 local DAY = 86400;
 local HOUR = 3600;
 
+local EVENTS = GoldPlanner.EVENTS;
+
 -- Only keep snapshots of the history the older it gets
 local COMPACTION_WINDOWS = {
     { age = DAY, bucket = 0 },
@@ -189,3 +191,16 @@ function History:GetWindow(windowSeconds)
         endCopper = latest[COPPER],
     };
 end
+
+function History:RecordCharacterSnapshot(copper)
+    self:Record(GoldPlanner.Data.Account:GetCharacter().history, copper);
+    self:RequestTotalSnapshot();
+end
+
+function History:RecordWarbandSnapshot(copper)
+    self:Record(GoldPlanner.Data.Account:GetWarband().history, copper);
+    self:RequestTotalSnapshot();
+end
+
+EventRegistry:RegisterCallback(EVENTS.CHARACTER_COPPER_UPDATED, History.RecordCharacterSnapshot, History);
+EventRegistry:RegisterCallback(EVENTS.WARBAND_COPPER_UPDATED, History.RecordWarbandSnapshot, History);
