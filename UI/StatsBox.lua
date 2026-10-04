@@ -5,6 +5,8 @@ GoldPlanner.UI = GoldPlanner.UI or {};
 local StatsBox = {};
 GoldPlanner.UI.StatsBox = StatsBox;
 
+local EVENTS = GoldPlanner.EVENTS;
+
 function StatsBox:Build(parent)
     if self.statsBox then
         return;
@@ -140,8 +142,14 @@ end
 
 function StatsBox:RegisterEvents()
     EventRegistry:RegisterCallback(
-        GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED,
+        EVENTS.HISTORY_TOTAL_UPDATED,
         self.Update,
-        self
-    );
+        self);
+
+    EventRegistry:RegisterCallback(
+        EVENTS.GOAL_UPDATED,
+        self.Update,
+        self);
 end
+
+EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_LOGIN, StatsBox.Build, StatsBox);

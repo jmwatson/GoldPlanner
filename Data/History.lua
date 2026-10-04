@@ -16,6 +16,8 @@ local WEEK = 604800;
 local DAY = 86400;
 local HOUR = 3600;
 
+local EVENTS = GoldPlanner.EVENTS;
+
 -- Only keep snapshots of the history the older it gets
 local COMPACTION_WINDOWS = {
     { age = DAY, bucket = 0 },
@@ -75,10 +77,11 @@ function History:Record(history, copper)
 
     -- Don't record enteries if nothing has changed
     if lastSnapshot and lastSnapshot[COPPER] == snapshot[COPPER] then
-        return;
+        return false;
     end
 
     tinsert(history, snapshot);
+    return true;
 end
 
 function History:SetTotalSource(provider)
@@ -95,8 +98,11 @@ function History:RequestTotalSnapshot()
     -- This happens at the end of the current frame to avoid multiple snapshots being added in the same frame
     C_Timer.After(0, function()
         totalHistoryPending = false;
-        self:Record(GoldPlanner.db.totalHistory, totalSource());
-        EventRegistry:TriggerEvent(GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED);
+        local recorded = self:Record(GoldPlanner.db.totalHistory, totalSource());
+
+        if recorded then
+            EventRegistry:TriggerEvent(GoldPlanner.EVENTS.HISTORY_TOTAL_UPDATED);
+        end
     end);
 end
 
@@ -189,3 +195,16 @@ function History:GetWindow(windowSeconds)
         endCopper = latest[COPPER],
     };
 end
+
+function History:RecordCharacterSnapshot(copper)
+    self:Record(GoldPlanner.Data.Account:GetCharacter().history, copper);
+    self:RequestTotalSnapshot();
+end
+
+function History:RecordWarbandSnapshot(copper)
+    self:Record(GoldPlanner.Data.Account:GetWarband().history, copper);
+    self:RequestTotalSnapshot();
+end
+
+EventRegistry:RegisterCallback(EVENTS.CHARACTER_COPPER_UPDATED, History.RecordCharacterSnapshot, History);
+EventRegistry:RegisterCallback(EVENTS.WARBAND_COPPER_UPDATED, History.RecordWarbandSnapshot, History);

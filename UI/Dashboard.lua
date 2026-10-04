@@ -8,6 +8,8 @@ GoldPlanner.UI.Dashboard = Dashboard;
 local PANEL_PADDING = 16;
 local NAV_WIDTH = 110;
 
+local HasScannedWorldQuests = false;
+
 local function CreatePanel(parent)
     local panel = CreateFrame("Frame", nil, parent);
     panel:SetAllPoints(parent);
@@ -66,8 +68,6 @@ function Dashboard:Build()
 
     navMenu:AddItem("Overview", overviewPanel);
     navMenu:AddItem("World Quests", worldQuestPanel, function()
-        WQ:Update();
-
         if not HasScannedWorldQuests then
             HasScannedWorldQuests = true;
             WQ:RefreshWorldQuestGold();
@@ -82,15 +82,12 @@ function Dashboard:Build()
     dashboard.activitiesPanel = worldQuestPanel;
 
     self.dashboard = dashboard;
-
-    GoldPlanner.UI.Overview:Update();
 end
 
 function Dashboard:Toggle()
     if self.dashboard:IsShown() then
         self.dashboard:Hide();
     else
-        GoldPlanner.UI.Overview:Update();
         self.dashboard:Show();
     end
 end
@@ -112,3 +109,5 @@ function Dashboard:ShowOverview()
         self.dashboard:Show();
     end
 end
+
+EventRegistry:RegisterFrameEventAndCallback(GoldPlanner.EVENTS.PLAYER_LOGIN, Dashboard.Build, Dashboard);

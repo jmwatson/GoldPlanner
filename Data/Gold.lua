@@ -6,6 +6,7 @@ local Gold = {};
 GoldPlanner.Data.Gold = Gold;
 
 local Account = GoldPlanner.Data.Account;
+local EVENTS = GoldPlanner.EVENTS;
 
 function Gold:GetCharacterCopper()
     local character = Account:FindCharacter();
@@ -41,3 +42,34 @@ function Gold:UpdateWarbandCopper()
 
     return warband.copper;
 end
+
+function Gold:OnPlayerMoney()
+    EventRegistry:TriggerEvent(EVENTS.CHARACTER_COPPER_UPDATED, self:UpdateCharacterCopper());
+end
+
+function Gold:OnAccountMoney()
+    EventRegistry:TriggerEvent(EVENTS.WARBAND_COPPER_UPDATED, self:UpdateWarbandCopper());
+end
+
+function Gold:OnEnteringWorld()
+    self:OnPlayerMoney();
+    self:OnAccountMoney();
+end
+
+function Gold:Initialize()
+    if self.initialized then
+        return;
+    end
+
+    self.initialized = true;
+
+    GoldPlanner.Data.History:SetTotalSource(function()
+        return self:GetTotalCopper();
+    end);
+
+    EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_MONEY, self.OnPlayerMoney, self);
+    EventRegistry:RegisterFrameEventAndCallback(EVENTS.ACCOUNT_MONEY, self.OnAccountMoney, self);
+    EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_ENTERING_WORLD, self.OnEnteringWorld, self);
+end
+
+EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_LOGIN, Gold.Initialize, Gold);
