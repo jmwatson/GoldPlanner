@@ -25,13 +25,20 @@ History -> History : Record(totalHistory, totalSource())
 History -> ER : TriggerEvent(HISTORY_TOTAL_UPDATED)
 deactivate History
 
-par UI subscribers
-  ER -> Overview : Update()
-and
-  ER -> StatsBox : Update()
-and
-  ER -> ProgressBar : Update()
-end
+ER -> Overview : HISTORY_TOTAL_UPDATED
+activate Overview
+Overview -> Overview : Update()
+deactivate Overview
+
+ER -> StatsBox : HISTORY_TOTAL_UPDATED
+activate StatsBox
+StatsBox -> StatsBox : Update()
+deactivate StatsBox
+
+ER -> ProgressBar : HISTORY_TOTAL_UPDATED
+activate ProgressBar
+ProgressBar -> ProgressBar : Update()
+deactivate ProgressBar
 
 note over Gold,History
 Gold owns money-state updates.
