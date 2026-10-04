@@ -68,8 +68,6 @@ function Dashboard:Build()
 
     navMenu:AddItem("Overview", overviewPanel);
     navMenu:AddItem("World Quests", worldQuestPanel, function()
-        WQ:Update();
-
         if not HasScannedWorldQuests then
             HasScannedWorldQuests = true;
             WQ:RefreshWorldQuestGold();
@@ -84,8 +82,6 @@ function Dashboard:Build()
     dashboard.activitiesPanel = worldQuestPanel;
 
     self.dashboard = dashboard;
-
-    GoldPlanner.UI.Overview:Update();
 end
 
 function Dashboard:Toggle()
