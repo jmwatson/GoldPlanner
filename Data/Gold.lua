@@ -71,3 +71,5 @@ function Gold:Initialize()
     EventRegistry:RegisterFrameEventAndCallback(EVENTS.ACCOUNT_MONEY, self.OnAccountMoney, self);
     EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_ENTERING_WORLD, self.OnEnteringWorld, self);
 end
+
+EventRegistry:RegisterFrameEventAndCallback(EVENTS.PLAYER_LOGIN, Gold.Initialize, Gold);

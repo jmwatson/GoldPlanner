@@ -127,7 +127,6 @@ local function OnAddonLoaded(_, loadedAddonName)
         GoldPlanner.Data.History:CompactAll(
             GoldPlanner.Data.Account:GetCharacters(),
             GoldPlanner.Data.Account:GetWarband());
-        GoldPlanner.Data.Gold:Initialize();
         RegisterSlashCommands();
 end
 
