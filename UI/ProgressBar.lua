@@ -173,3 +173,5 @@ function ProgressBar:RegisterEvents()
         self
     );
 end
+
+EventRegistry:RegisterFrameEventAndCallback(GoldPlanner.EVENTS.PLAYER_LOGIN, ProgressBar.Build, ProgressBar);

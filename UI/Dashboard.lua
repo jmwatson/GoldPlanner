@@ -114,3 +114,5 @@ function Dashboard:ShowOverview()
         self.dashboard:Show();
     end
 end
+
+EventRegistry:RegisterFrameEventAndCallback(GoldPlanner.EVENTS.PLAYER_LOGIN, Dashboard.Build, Dashboard);

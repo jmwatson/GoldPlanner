@@ -70,9 +70,10 @@ function DB:InitializeDatabase()
         GoldPlannerDB = {};
     end
 
-    CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
-
-    GoldPlanner.db = GoldPlannerDB;
+    if not GoldPlanner.db then
+        CopyDefaults(DEFAULT_DATABASE, GoldPlannerDB);
+        GoldPlanner.db = GoldPlannerDB;
+    end
 end
 
 function DB:GetDefaults()
@@ -80,7 +81,7 @@ function DB:GetDefaults()
 end
 
 function DB:IsInitialized()
-    if not GoldPlannerDB then
+    if not GoldPlanner.db then
         return false;
     end
 

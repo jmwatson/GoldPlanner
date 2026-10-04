@@ -139,13 +139,6 @@ local function SetupHistory()
         GoldPlanner.Data.History:CompactAll(GoldPlanner.Data.Account:GetCharacters(), GoldPlanner.Data.Account:GetWarband());
 end
 
-local function BuildUI()
-    GoldPlanner.UI.Settings:Build();
-    GoldPlanner.UI.Dashboard:Build();
-    GoldPlanner.UI.StatsBox:Build();
-    GoldPlanner.UI.ProgressBar:Build();
-end
-
 local function HandleEvents(self, event, ...)
     if event == EVENTS.ADDON_LOADED then
         local loadedAddonName = ...;
@@ -156,7 +149,6 @@ local function HandleEvents(self, event, ...)
 
         GoldPlanner.DB:InitializeDatabase();
         SetupHistory();
-        BuildUI();
         RegisterSlashCommands();
     elseif event == EVENTS.PLAYER_ENTERING_WORLD then
         RecordCharacterGold();

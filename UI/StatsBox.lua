@@ -145,3 +145,5 @@ function StatsBox:RegisterEvents()
         self
     );
 end
+
+EventRegistry:RegisterFrameEventAndCallback(GoldPlanner.EVENTS.PLAYER_LOGIN, StatsBox.Build, StatsBox);

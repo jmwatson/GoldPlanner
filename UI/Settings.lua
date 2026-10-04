@@ -344,3 +344,5 @@ function _Settings:Build()
 
     self.category = category;
 end
+
+EventRegistry:RegisterFrameEventAndCallback(GoldPlanner.EVENTS.PLAYER_LOGIN, _Settings.Build, _Settings);
