@@ -114,7 +114,7 @@ function WorldQuests:Update()
     end
 
     table.sort(quests, function(a, b)
-        return a.gold > b.gold;
+        return a.zoneID > b.zoneID;
     end);
 
     self.totalText:SetText("Total Gold Available: " .. GetMoneyString(WQ:GetTotalGold(), true));
