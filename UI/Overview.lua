@@ -91,6 +91,7 @@ function Overview:Build(parent)
     self:RegisterEvents();
 
     self.built = true;
+    self:Update();
 end
 
 function Overview:Update()
