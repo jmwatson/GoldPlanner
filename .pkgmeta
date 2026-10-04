@@ -5,3 +5,4 @@ ignore:
   - .pkgmeta
   - README.md
   - LICENSE
+  - docs
