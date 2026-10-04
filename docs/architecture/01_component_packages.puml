@@ -18,8 +18,8 @@ package "GoldPlanner" {
     [Goal]
   }
   package "Activities" {
-    [Activities]
-    [WorldQuests]
+    [Activities Service] as ActivitiesService
+    [WorldQuests Service] as WorldQuestsService
   }
   package "UI" {
     [Dashboard]
@@ -60,7 +60,7 @@ database "SavedVariables\nGoldPlannerDB" as DB
 [Settings] --> [Goal]
 [Dashboard] --> [Overview]
 [Dashboard] --> [WorldQuests UI]
-[WorldQuests UI] --> [WorldQuests]
+[WorldQuests UI] --> WorldQuestsService
 [WorldQuests UI] --> EventRegistry
 
 [Database] --> DB
