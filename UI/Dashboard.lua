@@ -92,7 +92,6 @@ function Dashboard:Toggle()
     if self.dashboard:IsShown() then
         self.dashboard:Hide();
     else
-        GoldPlanner.UI.Overview:Update();
         self.dashboard:Show();
     end
 end
