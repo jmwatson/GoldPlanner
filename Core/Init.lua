@@ -64,21 +64,6 @@ local function HandleBarCommand(value)
     end
 end
 
-local wqUpdateScheduled = false;
-
-local function ScheduleWorldQuestPanelUpdate()
-    if wqUpdateScheduled then
-        return;
-    end
-
-    wqUpdateScheduled = true;
-
-    C_Timer.After(0, function()
-        wqUpdateScheduled = false;
-        GoldPlanner.UI.WorldQuests:Update();
-    end);
-end
-
 local function HandleSlashCommand(parameters)
     local command, value = parameters:match("^(%S+)%s*(.*)$");
     local usage = "Usage: /gp goal <gold amount> [days]";
@@ -180,22 +165,6 @@ local function HandleEvents(self, event, ...)
         RecordCharacterGold();
     elseif event == EVENTS.ACCOUNT_MONEY then
         RecordWarbandGold();
-    elseif event == EVENTS.QUEST_LOG_UPDATE then
-        local WQ = GoldPlanner.Activities.WorldQuests;
-        local pending = WQ:GetPending();
-        local resolvedAny = false;
-
-        for questID in pairs(pending) do
-            if HaveQuestRewardData(questID) then
-                WQ:HandleRewardData(questID);
-                pending[questID] = nil;
-                resolvedAny = true;
-            end
-        end
-
-        if resolvedAny then
-            ScheduleWorldQuestPanelUpdate();
-        end
     end
 end
 
@@ -204,5 +173,4 @@ eventFrame:RegisterEvent(EVENTS.ADDON_LOADED);
 eventFrame:RegisterEvent(EVENTS.PLAYER_MONEY);
 eventFrame:RegisterEvent(EVENTS.ACCOUNT_MONEY);
 eventFrame:RegisterEvent(EVENTS.PLAYER_ENTERING_WORLD);
-eventFrame:RegisterEvent(EVENTS.QUEST_LOG_UPDATE);
 eventFrame:SetScript("OnEvent", HandleEvents);

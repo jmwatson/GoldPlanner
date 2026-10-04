@@ -217,3 +217,21 @@ function WorldQuests:HandleRewardData(questID)
 
     return true;
 end
+
+function WorldQuests:ResolvePendingRewards()
+    if next(PendingRewardData) == nil then
+        return false;
+    end
+
+    local resolvedAny = false;
+
+    for questID in pairs(PendingRewardData) do
+        if HaveQuestRewardData(questID) then
+            self:HandleRewardData(questID);
+            PendingRewardData[questID] = nil;
+            resolvedAny = true;
+        end
+    end
+
+    return resolvedAny;
+end

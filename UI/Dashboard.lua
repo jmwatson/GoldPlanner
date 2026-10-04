@@ -8,6 +8,8 @@ GoldPlanner.UI.Dashboard = Dashboard;
 local PANEL_PADDING = 16;
 local NAV_WIDTH = 110;
 
+local HasScannedWorldQuests = false;
+
 local function CreatePanel(parent)
     local panel = CreateFrame("Frame", nil, parent);
     panel:SetAllPoints(parent);

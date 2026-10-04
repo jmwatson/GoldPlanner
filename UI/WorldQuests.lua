@@ -7,6 +7,8 @@ GoldPlanner.UI.WorldQuests = WorldQuests
 
 local ROW_HEIGHT = 18;
 
+local updateScheduled = false;
+
 local function CreateQuestRow(parent)
     local WQ = GoldPlanner.Activities.WorldQuests;
 
@@ -91,6 +93,11 @@ function WorldQuests:Build(parent)
     self.scrollChild = scrollChild;
     self.rows = {};
 
+    EventRegistry:RegisterFrameEventAndCallback(
+        GoldPlanner.EVENTS.QUEST_LOG_UPDATE,
+        self.OnQuestLogUpdate,
+        self);
+
     self.built = true;
 
     self:Update();
@@ -150,4 +157,23 @@ end
 function WorldQuests:RefreshWorldQuestGold()
     GoldPlanner.Activities.WorldQuests:ScanAll();
     self:Update();
+end
+
+function WorldQuests:RequestUpdate()
+    if updateScheduled then
+        return;
+    end
+
+    updateScheduled = true;
+
+    C_Timer.After(0, function()
+        updateScheduled = false;
+        self:Update();
+    end);
+end
+
+function WorldQuests:OnQuestLogUpdate()
+    if GoldPlanner.Activities.WorldQuests:ResolvePendingRewards() then
+        self:RequestUpdate();
+    end
 end
