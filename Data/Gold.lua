@@ -29,15 +29,17 @@ end
 
 function Gold:UpdateCharacterCopper()
     local character = Account:GetCharacter();
-
     character.copper = GetMoney();
-    
+
     return character.copper;
 end
 
 function Gold:UpdateWarbandCopper()
-    local warband = Account:GetWarband();
+    if not C_Bank.CanViewBank(Enum.BankType.Account) then
+        return nil;
+    end
 
+    local warband = Account:GetWarband();
     warband.copper = C_Bank.FetchDepositedMoney(Enum.BankType.Account);
 
     return warband.copper;
@@ -48,7 +50,11 @@ function Gold:OnPlayerMoney()
 end
 
 function Gold:OnAccountMoney()
-    EventRegistry:TriggerEvent(EVENTS.WARBAND_COPPER_UPDATED, self:UpdateWarbandCopper());
+    local copper = self:UpdateWarbandCopper();
+
+    if copper ~= nil then
+        EventRegistry:TriggerEvent(EVENTS.WARBAND_COPPER_UPDATED, copper);
+    end
 end
 
 function Gold:OnEnteringWorld()
