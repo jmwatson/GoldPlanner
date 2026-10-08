@@ -66,7 +66,9 @@ function StatsBox:Update()
     local goal = GP.Data.Goal:Get();
     local total = GP.Data.Gold:GetTotalCopper();
 
-    frame.rate:SetText(Format.Rate(Stats:GetHourlyRate(), true));
+    frame.rate:SetText(string.format("%s: %s",
+        GP.STRINGS.RATE,
+        Format.Rate(Stats:GetHourlyRate(), true)));
     frame.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
 
     if goal > 0 then

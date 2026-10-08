@@ -268,6 +268,28 @@ local function BuildStatsPadding(addonName, category, settings)
     return paddingSetting;
 end
 
+local function BuildShowMinimapButton(addonName, category, settings)
+    local variable = "show";
+    local name = "Show Minimap Button";
+    local description = "Show the minimap button.";
+    local defaultValue = true;
+    local showSetting = Settings.RegisterAddOnSetting(
+        category,
+        addonName .. "_" .. name:gsub("%s+", ""),
+        variable,
+        settings,
+        type(defaultValue),
+        name,
+        defaultValue
+    );
+    showSetting:SetValueChangedCallback(function(_, value)
+        GoldPlanner.UI.Minimap:Show(value);
+    end);
+    Settings.CreateCheckbox(category, showSetting, description);
+
+    return showSetting;
+end
+
 local function CreateResetButton(parent, anchor, text, onClickCallback)
         local button = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate");
         button:SetText(text);
@@ -287,6 +309,7 @@ function _Settings:Build()
 
     local showProgressBarSetting, lockProgressBarSetting, widthProgressBarSetting, heightProgressBarSetting;
     local showStatsBoxSetting, lockStatsBoxSetting, paddingStatsBoxSetting;
+    local showMinimapSetting;
 
     local panel = CreateFrame("Frame");
     local category = Settings.RegisterCanvasLayoutCategory(panel, GoldPlanner.STRINGS.ADDON_TITLE);
@@ -336,6 +359,12 @@ function _Settings:Build()
     showStatsBoxSetting = BuildShowStatsBox(addonName, statsBoxCategory, statsBoxSettings);
     lockStatsBoxSetting = BuildLockStatsBox(addonName, statsBoxCategory, statsBoxSettings);
     paddingStatsBoxSetting = BuildStatsPadding(addonName, statsBoxCategory, statsBoxSettings);
+
+    local minimapCategory = Settings.RegisterVerticalLayoutSubcategory(category, "Minimap");
+    Settings.RegisterAddOnCategory(minimapCategory);
+
+    local minimapSettings = GoldPlanner.db.settings.statsBox;
+    showMinimapSetting = BuildShowMinimapButton(addonName, minimapCategory, minimapSettings);
 
     self.category = category;
 end

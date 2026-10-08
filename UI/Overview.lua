@@ -127,7 +127,9 @@ function Overview:Update()
     end
 
     self.timeToGoal:SetText(Format.TimeToGoal(goal, Stats:GetTimeToGoal(total, goal)));
-    self.rate:SetText(Format.Rate(Stats:GetHourlyRate(), false));
+    self.rate:SetText(string.format("%s: %s",
+        GP.STRINGS.RATE,
+        Format.Rate(Stats:GetHourlyRate(), false)));
     self.dailyGoal:SetText(Format.DailyGoal(Stats:GetDailyGoalProgress(Goal:GetDaily(), total)));
 end
 
