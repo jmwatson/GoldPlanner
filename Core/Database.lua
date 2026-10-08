@@ -39,6 +39,10 @@ local DEFAULT_DATABASE = {
             locked = false,
             show = true,
         },
+        minimap = {
+            angle = 225,
+            show = true,
+        },
     },
 };
 

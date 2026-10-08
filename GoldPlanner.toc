@@ -30,5 +30,6 @@ UI/WorldQuests.lua
 UI/Dashboard.lua
 UI/ProgressBar.lua
 UI/StatsBox.lua
+UI/Minimap.lua
 
 Core/Init.lua

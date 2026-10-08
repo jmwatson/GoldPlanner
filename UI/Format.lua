@@ -34,17 +34,11 @@ end
 
 function Format.Rate(hourlyCopper, shouldTrim)
     if not hourlyCopper then
-        return string.format("%s: %s", STRINGS.RATE, STRINGS.NOT_ENOUGH_DATA);
+        return STRINGS.NOT_ENOUGH_DATA;
     end
 
-    local sign = hourlyCopper < 0 and "-" or "";
-    local value = math.abs(hourlyCopper);
-    value = shouldTrim and trim(value) or value;
-
-    return string.format("%s: %s%s / hour %s",
-        STRINGS.RATE,
-        sign,
-        GetMoneyString(value, true),
+    return string.format("%s / hour %s",
+        Format.SignedMoney(hourlyCopper),
         hourlyCopper < 0 and ARROW_DOWN or ARROW_UP);
 end
 
@@ -69,4 +63,14 @@ function Format.DailyGoal(daily)
         STRINGS.DAILY_GOAL,
         GetMoneyString(trim(daily.earned), true),
         GetMoneyString(trim(daily.target), true));
+end
+
+function Format.SignedMoney(copper)
+    copper = math.floor(copper);
+
+    if copper < 0 then
+        return string.format("-%s", GetMoneyString(-copper, true));
+    end
+
+    return GetMoneyString(copper, true);
 end

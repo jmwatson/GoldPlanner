@@ -22,6 +22,8 @@ GoldPlanner.COLORS = {
     GOLD = "FFD100",
     SILVER = "C0C0C0",
     COPPER = "B87333",
+    WHITE = "FFFFFF",
+    GREEN = "00FF00"
 };
 
 GoldPlanner.STRINGS = {
@@ -48,6 +50,8 @@ GoldPlanner.STRINGS = {
     NOT_ENOUGH_DATA = "Not enough data",
     UNAVAILABLE = "Unavailable",
     REACHED = "Reached",
+
+    TODAY = "Today",
 };
 
 GoldPlanner.EXPANSION_CONTINENTS = {
