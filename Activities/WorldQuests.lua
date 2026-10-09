@@ -191,12 +191,15 @@ function WorldQuests:GetTotalGold()
     return total;
 end
 
+function WorldQuests:IsTracked(questID)
+    return C_QuestLog.GetQuestWatchType(questID) ~= nil;
+end
+
 function WorldQuests:Track(questID)
     C_QuestLog.AddWorldQuestWatch(questID);
     C_SuperTrack.SetSuperTrackedQuestID(questID);
 end
 
--- Not needed yet, but leaving in on the off chance we want this functionality later
 function WorldQuests:Untrack(questID)
     C_QuestLog.RemoveWorldQuestWatch(questID);
 end
