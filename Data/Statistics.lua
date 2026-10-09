@@ -7,14 +7,7 @@ GoldPlanner.Data.Statistics = Statistics;
 
 local HOUR = 3600;
 local STATISTICS_WINDOW = HOUR;
-
-local function GetStartOfToday()
-    local today = date("*t");
-    today.hour = 0;
-    today.min = 0;
-    today.sec = 0;
-    return time(today);
-end
+local TODAY = date("*t");
 
 function Statistics:GetMoneyRate(windowSeconds)
     local window = GoldPlanner.Data.History:GetWindow(windowSeconds);
@@ -64,7 +57,7 @@ function Statistics:GetDailyGoalProgress(dailyGoal, currentCopper)
         return nil;
     end
 
-    local earnedToday = self:GetCopperEarnedSince(GetStartOfToday(), currentCopper);
+    local earnedToday = self:GetCopperEarnedSince(GoldPlanner.Utils.GetStartOfDay(TODAY), currentCopper);
 
     return {
         target = dailyGoal,

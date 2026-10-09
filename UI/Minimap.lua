@@ -17,13 +17,7 @@ local ICON_SIZE_PRESSED = ICON_SIZE - 2;
 local ICON_CENTER_X = 15.5;
 local ICON_CENTER_Y = -14.5;
 
-local function GetStartOfToday()
-    local today = date("*t");
-    today.hour = 0;
-    today.min = 0;
-    today.sec = 0;
-    return time(today);
-end
+local TODAY = date("*t");
 
 local function PositionButton(button, angle)
     local radius = (Minimap:GetWidth() / 2) + RADIUS_OFFSET;
@@ -51,7 +45,7 @@ local function ShowTooltip(button)
     local STRINGS = GP.STRINGS;
 
     local total = GP.Data.Gold:GetTotalCopper();
-    local earnedToday = Stats:GetCopperEarnedSince(GetStartOfToday(), total);
+    local earnedToday = Stats:GetCopperEarnedSince(GP.Utils.GetStartOfDay(TODAY), total);
 
     GameTooltip:SetOwner(button, "ANCHOR_LEFT");
     GameTooltip:ClearLines();
