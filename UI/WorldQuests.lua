@@ -5,48 +5,27 @@ GoldPlanner.UI = GoldPlanner.UI or {};
 local WorldQuests = {};
 GoldPlanner.UI.WorldQuests = WorldQuests
 
-local ROW_HEIGHT = 18;
+local ROW_HEIGHT = GoldPlanner.UI.ActivityRow.HEIGHT;
 
 local updateScheduled = false;
 
 local function CreateQuestRow(parent)
     local WQ = GoldPlanner.Activities.WorldQuests;
 
-    local row = CreateFrame("Button", nil, parent);
-    row:SetHeight(ROW_HEIGHT);
-
-    local highlight = row:CreateTexture(nil, "HIGHLIGHT");
-    highlight:SetAllPoints();
-    highlight:SetColorTexture(1, 1, 1, 0.08);
-
-    row.gold = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
-    row.gold:SetPoint("LEFT", 0, 0);
-    row.gold:SetWidth(100);
-    row.gold:SetJustifyH("LEFT");
-
-    row.title = row:CreateFontString(nil, "OVERLAY", "GameFontWhiteSmall");
-    row.title:SetPoint("LEFT", row.gold, "RIGHT", 8, 0);
-    row.title:SetPoint("RIGHT", row, "RIGHT", 0, 0);
-    row.title:SetJustifyH("LEFT");
-    row.title:SetWordWrap(false);
-
-    row:SetScript("OnClick", function(self)
-        if self.questID then
-            WQ:Track(self.questID);
-        end
-    end);
-
-    row:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOP");
-        GameTooltip:SetText("Click to track");
-        GameTooltip:Show();
-    end);
-
-    row:SetScript("OnLeave", function(self)
-        GameTooltip:Hide();
-    end);
-
-    return row;
+    return GoldPlanner.UI.ActivityRow.Create(parent, {
+        isTracked = function(questID)
+            return WQ:IsTracked(questID);
+        end,
+        track = function(questID)
+            WQ:Track(questID);
+        end,
+        untrack = function(questID)
+            WQ:Untrack(questID);
+        end,
+        tooltip = function(tooltip, _, isTracked)
+            tooltip:SetText(isTracked and "Click to untrack" or "Click to track");
+        end,
+    });
 end
 
 function WorldQuests:Build(parent)
@@ -140,9 +119,10 @@ function WorldQuests:Update()
 
         local zoneName = quest.zoneName and quest.zoneName or "Unknown";
 
-        row.gold:SetText(GetMoneyString(quest.gold, true));
-        row.title:SetText(string.format("%s (%s)", quest.title or "Unknown Quest", zoneName));
-        row.questID = quest.questID;
+        row:SetActivity(
+            quest.questID,
+            GetMoneyString(quest.gold, true),
+            string.format("%s (%s)", quest.title or "Unknown Quest", zoneName));
         row:Show();
     end
 
